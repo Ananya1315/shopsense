@@ -6,6 +6,9 @@ from app.database import get_db
 from app.models.product import Product
 from app.models.vendor import Vendor
 from app.schemas.product import ProductCreate, ProductResponse
+from app.utils.security import oauth2_scheme
+
+from app.utils.security import get_current_vendor
 
 router = APIRouter()
 
@@ -36,7 +39,12 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     return new_product
 
 @router.get("/products", response_model=List[ProductResponse])
-def get_products(db: Session = Depends(get_db)):
+def get_products(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+):
+    print("TOKEN =", token)
+
     products = db.query(Product).all()
     return products
 

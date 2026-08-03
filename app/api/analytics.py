@@ -1,8 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from typing import List
-from sqlalchemy import desc
+
+
+from app.database import get_db
+from app.models.vendor import Vendor
+from app.models.product import Product
+from app.models.transaction import Transaction
 
 from app.database import get_db
 from app.models.product import Product
@@ -83,4 +88,65 @@ def get_top_vendor(db: Session = Depends(get_db)):
         "vendor_name": top_vendor.name,
         "inventory_value": top_vendor.inventory_value
     }
-     
+
+
+@router.get("/analytics/vendor/{vendor_id}/sales")
+def get_total_sales(
+    vendor_id: int,
+    db: Session = Depends(get_db)
+):
+
+    vendor = (
+        db.query(Vendor)
+        .filter(Vendor.vendor_id == vendor_id)
+        .first()
+    )
+
+    if vendor is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
+    total_sales = (
+        db.query(func.sum(Transaction.quantity))
+        .join(Product, Product.product_id == Transaction.product_id)
+        .filter(Product.vendor_id == vendor_id)
+        .scalar()
+    )
+
+    return {
+        "vendor_id": vendor_id,
+        "total_sales": total_sales or 0
+    }
+
+
+@router.get("/analytics/vendor/{vendor_id}/revenue")
+def get_total_revenue(
+    vendor_id: int,
+    db: Session = Depends(get_db)
+):
+
+    vendor = (
+        db.query(Vendor)
+        .filter(Vendor.vendor_id == vendor_id)
+        .first()
+    )
+
+    if vendor is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
+    total_revenue = (
+        db.query(func.sum(Transaction.total_amount))
+        .join(Product, Product.product_id == Transaction.product_id)
+        .filter(Product.vendor_id == vendor_id)
+        .scalar()
+    )
+
+    return {
+        "vendor_id": vendor_id,
+        "total_revenue": total_revenue or 0
+    }
