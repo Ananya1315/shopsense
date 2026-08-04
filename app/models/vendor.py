@@ -9,6 +9,7 @@ class Vendor(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String, nullable=False)
+    role = Column(String, default="vendor")
     phone = Column(String(20), nullable=False)
     address = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

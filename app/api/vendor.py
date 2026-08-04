@@ -1,24 +1,32 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.database import get_db
 from app.models.vendor import Vendor
-from app.schemas.vendor import VendorCreate, VendorResponse
+from app.schemas.vendor import VendorCreate, VendorResponse, VendorLogin
 
-from app.utils.security import hash_password
-from app.schemas.vendor import VendorLogin
-from app.utils.security import verify_password
-from app.utils.security import create_access_token
-
+from app.utils.security import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_admin
+)
 
 router = APIRouter()
 
+
 @router.post("/vendors", response_model=VendorResponse)
-def create_vendor(vendor: VendorCreate, db: Session = Depends(get_db)):
+def create_vendor(
+    vendor: VendorCreate,
+    db: Session = Depends(get_db),
+   current_admin: Vendor = Depends(get_current_admin)
+):
     new_vendor = Vendor(
         name=vendor.name,
         email=vendor.email,
         password=hash_password(vendor.password),
+        role=vendor.role,
         phone=vendor.phone,
         address=vendor.address
     )
@@ -28,6 +36,7 @@ def create_vendor(vendor: VendorCreate, db: Session = Depends(get_db)):
     db.refresh(new_vendor)
 
     return new_vendor
+
 
 @router.get("/vendors/{vendor_id}", response_model=VendorResponse)
 def get_vendor(vendor_id: int, db: Session = Depends(get_db)):
@@ -40,11 +49,14 @@ def get_vendor(vendor_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-def login_vendor(login_data: VendorLogin, db: Session = Depends(get_db)):
+def login_vendor(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
 
     vendor = (
         db.query(Vendor)
-        .filter(Vendor.email == login_data.email)
+        .filter(Vendor.email == form_data.username)
         .first()
     )
 
@@ -53,19 +65,20 @@ def login_vendor(login_data: VendorLogin, db: Session = Depends(get_db)):
             status_code=401,
             detail="Invalid email or password"
         )
-    
-    if not verify_password(login_data.password, vendor.password):
+
+    if not verify_password(form_data.password, vendor.password):
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password"
         )
 
     access_token = create_access_token(
-    {
-        "sub": vendor.email
-    }
+        {
+            "sub": vendor.email
+        }
     )
+
     return {
-    "access_token": access_token,
-    "token_type": "bearer"
-}
+        "access_token": access_token,
+        "token_type": "bearer"
+    }

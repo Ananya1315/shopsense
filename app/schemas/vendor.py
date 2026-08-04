@@ -5,6 +5,7 @@ class VendorCreate(BaseModel):
     name: str
     email: str
     password: str
+    role: str = "vendor"
     phone: str
     address: str
 
@@ -12,6 +13,7 @@ class VendorResponse(BaseModel):
     vendor_id: int
     name: str
     email: str
+    role:str
     phone: str
     address: str
 

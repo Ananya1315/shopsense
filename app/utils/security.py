@@ -61,9 +61,11 @@ def get_current_vendor(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ):
-    print("get_current_vendor called")
+    print("==========")
+    print("TOKEN:", token)
 
     email = verify_access_token(token)
+    print("EMAIL:", email)
 
     if email is None:
         raise HTTPException(
@@ -77,6 +79,11 @@ def get_current_vendor(
         .first()
     )
 
+    print("VENDOR:", vendor)
+
+    if vendor:
+        print("ROLE:", vendor.role)
+
     if vendor is None:
         raise HTTPException(
             status_code=401,
@@ -84,3 +91,14 @@ def get_current_vendor(
         )
 
     return vendor
+
+def get_current_admin(
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
+    if current_vendor.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. Admins only."
+        )
+
+    return current_vendor
