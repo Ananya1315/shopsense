@@ -30,9 +30,6 @@ app.include_router(analytic_router)
 app.include_router(customer_router)
 app.include_router(transaction_router)
 
-print("\n===== REGISTERED ROUTES =====")
-for route in app.routes:
-    print(route.path)
 @app.get("/")
 def home():
     return {"message": "Welcome to ShopSense Backend "}

@@ -13,6 +13,8 @@ class ProductResponse(BaseModel):
     vendor_id: int
     name: str
     description: str
+    seo_tags:str
+    seo_keywords:str
     price: float
     stock: int
     category: str

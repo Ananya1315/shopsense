@@ -82,3 +82,23 @@ def login_vendor(
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+@router.put("/vendor/{vendor_id}",response_model=VendorResponse)
+def update_vendor(vendor_id: int, vendor: VendorCreate, db: Session= Depends(get_db)):
+    if vendor is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Vendor not found"
+        )
+
+    existing_vendor = (db.query(Vendor).filter(Vendor.vendor_id == vendor_id).first())
+
+    existing_vendor.name=vendor.name
+    existing_vendor.email=vendor.email
+    existing_vendor.phone=vendor.phone
+    existing_vendor.address=vendor.address
+
+    db.commit()
+    db.refresh(existing_vendor)
+    
+    return existing_vendor

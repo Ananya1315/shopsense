@@ -14,6 +14,8 @@ class Product(Base):
     )
     name = Column(String(100), nullable=False)
     description = Column(String(255))
+    seo_tags=Column(String(255))
+    seo_keywords=Column(String(255))
     price = Column(Float, nullable=False)
     stock = Column(Integer, nullable=False)
     category = Column(String(100))

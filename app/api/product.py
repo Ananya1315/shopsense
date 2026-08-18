@@ -9,6 +9,7 @@ from app.schemas.product import ProductCreate, ProductResponse
 from app.utils.security import oauth2_scheme
 
 from app.utils.security import get_current_vendor
+from app.utils.ai import generate_product_content
 
 router = APIRouter()
 
@@ -24,10 +25,16 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
             status_code=404,
             detail="Vendor not found"
             )
+    ai_content = generate_product_content(
+    product.name,
+    product.category
+)
     new_product=Product(
         vendor_id=product.vendor_id,
         name=product.name,
-        description=product.description,
+        description=ai_content["description"],
+        seo_tags=ai_content["seo_tags"],
+        seo_keywords=ai_content["seo_keywords"],
         price=product.price,
         stock=product.stock,
         category=product.category,
@@ -43,7 +50,6 @@ def get_products(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ):
-    print("TOKEN =", token)
 
     products = db.query(Product).all()
     return products
