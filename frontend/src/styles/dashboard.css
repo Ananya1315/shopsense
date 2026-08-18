@@ -1,0 +1,146 @@
+.dashboard {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg-primary);
+}
+
+/* Sidebar */
+
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  padding: 28px 18px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  padding: 0 12px;
+  margin-bottom: 40px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+
+  padding: 12px;
+  border-radius: 8px;
+
+  text-align: left;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.logout-button {
+  margin-top: auto;
+
+  border: 1px solid var(--accent-secondary);
+  background: transparent;
+  color: var(--text-secondary);
+
+  padding: 11px;
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+/* Main content */
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+}
+
+.dashboard-header {
+  margin-bottom: 35px;
+}
+
+.dashboard-header h1 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.dashboard-header p {
+  color: var(--text-secondary);
+}
+
+/* Stats */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.stat-card {
+  padding: 24px;
+
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stat-card p {
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.stat-card h2 {
+  font-size: 28px;
+}
+
+/* Quick actions */
+
+.dashboard-section {
+  margin-top: 40px;
+}
+
+.dashboard-section h2 {
+  margin-bottom: 20px;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.action-card {
+  padding: 20px;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.action-card:hover {
+  background: var(--accent-primary);
+}

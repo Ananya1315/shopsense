@@ -1,0 +1,119 @@
+.management-page {
+  min-height: 100vh;
+  padding: 40px;
+  background: var(--bg-primary);
+}
+
+.page-header {
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+}
+
+.vendor-table-container {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.vendor-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vendor-table th,
+.vendor-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.vendor-table th {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.vendor-table td {
+  color: var(--text-primary);
+}
+
+.vendor-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.status.approved {
+  background: rgba(111, 185, 143, 0.15);
+  color: var(--success);
+}
+
+.status.pending {
+  background: rgba(166, 166, 191, 0.15);
+  color: var(--text-secondary);
+}
+
+.status.rejected {
+  background: rgba(217, 108, 108, 0.15);
+  color: var(--danger);
+}
+
+.vendor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.approve-button,
+.reject-button {
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.approve-button {
+  background: var(--accent-primary);
+  border: none;
+}
+
+.approve-button:hover {
+  background: var(--accent-secondary);
+}
+
+.reject-button {
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.reject-button:hover {
+  background: rgba(217, 108, 108, 0.1);
+}
+
+.no-action {
+  color: var(--text-secondary);
+}
+
+.page-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+}
