@@ -1,0 +1,166 @@
+.products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 35px;
+}
+
+.product-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.delete-button {
+  padding: 9px 16px;
+  border: 1px solid #a55;
+  border-radius: 8px;
+  background: transparent;
+  color: #ef7373;
+  cursor: pointer;
+}
+
+.delete-button:hover {
+  background: rgba(230, 80, 80, 0.15);
+}
+
+.empty-products {
+  text-align: center !important;
+  padding: 50px !important;
+  color: #b8b8d0;
+}
+
+.product-error {
+  color: #ef7373;
+  margin-bottom: 20px;
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+.product-modal {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.65);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  z-index: 1000;
+}
+
+.product-form-card {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #38384f;
+
+  border: 1px solid #55556f;
+
+  border-radius: 16px;
+
+  padding: 30px;
+
+  box-sizing: border-box;
+}
+
+.product-form-card h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+.product-form-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.product-form-card label {
+  color: #c8c8dc;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+.product-form-card input,
+.product-form-card textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 12px;
+
+  border: 1px solid #666680;
+
+  border-radius: 8px;
+
+  background: #29293c;
+
+  color: white;
+
+  font-size: 15px;
+
+  outline: none;
+}
+
+.product-form-card input:focus,
+.product-form-card textarea:focus {
+  border-color: #8888aa;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.cancel-button {
+  padding: 13px 22px;
+
+  border: 1px solid #777795;
+
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #d5d5e5;
+
+  font-size: 16px;
+
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background: #4b4b65;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .products-header {
+    flex-direction: column;
+  }
+
+  .product-modal {
+    padding: 15px;
+  }
+
+  .product-form-card {
+    padding: 20px;
+  }
+
+}

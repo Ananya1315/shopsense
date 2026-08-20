@@ -1,18 +1,21 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.database import get_db
 from app.models.vendor import Vendor
+from app.models.product import Product
+from app.models.transaction import Transaction
 from app.schemas.vendor import VendorCreate, VendorResponse
 
 from app.utils.security import (
     hash_password,
     verify_password,
     create_access_token,
-    get_current_admin
+    get_current_admin,
+    get_current_vendor
 )
-
 router = APIRouter()
 
 
@@ -238,3 +241,79 @@ def update_vendor(
     db.refresh(existing_vendor)
 
     return existing_vendor
+
+@router.get("/vendor/me", response_model=VendorResponse)
+def get_current_vendor_info(
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
+    return current_vendor
+
+
+# -----------------------------------------
+# VENDOR DASHBOARD
+# -----------------------------------------
+
+@router.get("/vendor/dashboard")
+def get_vendor_dashboard(
+    db: Session = Depends(get_db),
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
+
+    vendor_id = current_vendor.vendor_id
+
+    # Total products belonging to this vendor
+    total_products = (
+        db.query(func.count(Product.product_id))
+        .filter(Product.vendor_id == vendor_id)
+        .scalar()
+    )
+
+    # Total sales
+    total_sales = (
+        db.query(func.sum(Transaction.quantity))
+        .join(
+            Product,
+            Product.product_id == Transaction.product_id
+        )
+        .filter(Product.vendor_id == vendor_id)
+        .scalar()
+    )
+
+    # Total revenue
+    total_revenue = (
+        db.query(func.sum(Transaction.total_amount))
+        .join(
+            Product,
+            Product.product_id == Transaction.product_id
+        )
+        .filter(Product.vendor_id == vendor_id)
+        .scalar()
+    )
+
+    # Inventory value
+    inventory_value = (
+        db.query(func.sum(Product.price * Product.stock))
+        .filter(Product.vendor_id == vendor_id)
+        .scalar()
+    )
+
+    # Low-stock products
+    low_stock_count = (
+        db.query(func.count(Product.product_id))
+        .filter(
+            Product.vendor_id == vendor_id,
+            Product.stock < 5
+        )
+        .scalar()
+    )
+
+    return {
+        "vendor_id": vendor_id,
+        "vendor_name": current_vendor.name,
+        "email": current_vendor.email,
+        "total_products": total_products or 0,
+        "total_sales": total_sales or 0,
+        "total_revenue": total_revenue or 0,
+        "inventory_value": inventory_value or 0,
+        "low_stock_count": low_stock_count or 0
+    }

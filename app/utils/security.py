@@ -61,11 +61,9 @@ def get_current_vendor(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ):
-    print("==========")
-    print("TOKEN:", token)
-
+    
     email = verify_access_token(token)
-    print("EMAIL:", email)
+   
 
     if email is None:
         raise HTTPException(
@@ -89,6 +87,11 @@ def get_current_vendor(
             status_code=401,
             detail="Vendor not found"
         )
+    if vendor.status != "approved":
+        raise HTTPException(
+        status_code=403,
+        detail="Vendor account is not approved."
+    )
 
     return vendor
 
