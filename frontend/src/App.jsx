@@ -8,12 +8,13 @@ import AdminProducts from "./pages/AdminProducts";
 import AdminAnalytics from "./pages/AdminAnalytics";
 
 import VendorDashboard from "./pages/VendorDashboard";
+import VendorProducts from "./pages/VendorProducts";
+import VendorSales from "./pages/VendorSales";
+import VendorCustomerAnalytics from "./pages/VendorCustomerAnalytics";
 
 import "./App.css";
 import "./styles/dashboard.css";
 import "./styles/vendorDashboard.css";
-import VendorProducts from "./pages/VendorProducts";
-import VendorSales from "./pages/VendorSales";
 
 
 function App() {
@@ -71,6 +72,7 @@ function App() {
       return null;
 
     }
+
   };
 
 
@@ -291,15 +293,19 @@ function AdminApp({ onLogout }) {
         onDashboard={() =>
           setActivePage("dashboard")
         }
+
         onVendors={() =>
           setActivePage("vendors")
         }
+
         onProducts={() =>
           setActivePage("products")
         }
+
         onAnalytics={() =>
           setActivePage("analytics")
         }
+
         onLogout={onLogout}
       />
     );
@@ -318,12 +324,15 @@ function AdminApp({ onLogout }) {
         onDashboard={() =>
           setActivePage("dashboard")
         }
+
         onProducts={() =>
           setActivePage("products")
         }
+
         onAnalytics={() =>
           setActivePage("analytics")
         }
+
         onLogout={onLogout}
       />
     );
@@ -342,12 +351,15 @@ function AdminApp({ onLogout }) {
         onDashboard={() =>
           setActivePage("dashboard")
         }
+
         onVendors={() =>
           setActivePage("vendors")
         }
+
         onAnalytics={() =>
           setActivePage("analytics")
         }
+
         onLogout={onLogout}
       />
     );
@@ -366,12 +378,15 @@ function AdminApp({ onLogout }) {
         onDashboard={() =>
           setActivePage("dashboard")
         }
+
         onVendors={() =>
           setActivePage("vendors")
         }
+
         onProducts={() =>
           setActivePage("products")
         }
+
         onLogout={onLogout}
       />
     );
@@ -384,16 +399,25 @@ function AdminApp({ onLogout }) {
 }
 
 
+// =====================================================
+// VENDOR APPLICATION
+// =====================================================
+
 function VendorApp({ onLogout }) {
 
   const [activePage, setActivePage] =
     useState("dashboard");
 
 
+  // =========================================
+  // DASHBOARD
+  // =========================================
+
   if (activePage === "dashboard") {
 
     return (
       <VendorDashboard
+
         onDashboard={() =>
           setActivePage("dashboard")
         }
@@ -406,17 +430,27 @@ function VendorApp({ onLogout }) {
           setActivePage("sales")
         }
 
+        onAnalytics={() =>
+          setActivePage("analytics")
+        }
+
         onLogout={onLogout}
+
       />
     );
 
   }
 
+
+  // =========================================
+  // PRODUCTS
+  // =========================================
 
   if (activePage === "products") {
 
     return (
       <VendorProducts
+
         onDashboard={() =>
           setActivePage("dashboard")
         }
@@ -425,17 +459,27 @@ function VendorApp({ onLogout }) {
           setActivePage("sales")
         }
 
+        onAnalytics={() =>
+          setActivePage("analytics")
+        }
+
         onLogout={onLogout}
+
       />
     );
 
   }
 
 
+  // =========================================
+  // SALES
+  // =========================================
+
   if (activePage === "sales") {
 
     return (
       <VendorSales
+
         onDashboard={() =>
           setActivePage("dashboard")
         }
@@ -444,7 +488,41 @@ function VendorApp({ onLogout }) {
           setActivePage("products")
         }
 
+        onAnalytics={() =>
+          setActivePage("analytics")
+        }
+
         onLogout={onLogout}
+
+      />
+    );
+
+  }
+
+
+  // =========================================
+  // CUSTOMER ANALYTICS
+  // =========================================
+
+  if (activePage === "analytics") {
+
+    return (
+      <VendorCustomerAnalytics
+
+        onDashboard={() =>
+          setActivePage("dashboard")
+        }
+
+        onProducts={() =>
+          setActivePage("products")
+        }
+
+        onSales={() =>
+          setActivePage("sales")
+        }
+
+        onLogout={onLogout}
+
       />
     );
 

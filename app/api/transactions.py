@@ -11,7 +11,7 @@ from app.schemas.transactions import (
     TransactionCreate,
     TransactionResponse
 )
-print("ROUTER LOADED")
+
 router = APIRouter()
 
 

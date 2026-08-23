@@ -4,20 +4,32 @@ from typing import List
 
 from app.database import get_db
 from app.models.customer import Customer
-from app.schemas.customers import CustomerCreate, CustomerResponse
-
-print("CUSTOMER ROUTER LOADED")
+from app.schemas.customers import (
+    CustomerCreate,
+    CustomerResponse
+)
 
 router = APIRouter()
 
 
-@router.post("/customers", response_model=CustomerResponse)
-def create_customer(customer: CustomerCreate, db: Session = Depends(get_db)):
+# =====================================================
+# CREATE CUSTOMER
+# =====================================================
+
+@router.post(
+    "/customers",
+    response_model=CustomerResponse
+)
+def create_customer(
+    customer: CustomerCreate,
+    db: Session = Depends(get_db)
+):
 
     new_customer = Customer(
         name=customer.name,
         email=customer.email,
-        phone=customer.phone
+        phone=customer.phone,
+        area=customer.area
     )
 
     db.add(new_customer)
@@ -27,24 +39,49 @@ def create_customer(customer: CustomerCreate, db: Session = Depends(get_db)):
     return new_customer
 
 
-@router.get("/customers", response_model=List[CustomerResponse])
-def get_customers(db: Session = Depends(get_db)):
+# =====================================================
+# GET ALL CUSTOMERS
+# =====================================================
 
-    customers = db.query(Customer).all()
+@router.get(
+    "/customers",
+    response_model=List[CustomerResponse]
+)
+def get_customers(
+    db: Session = Depends(get_db)
+):
+
+    customers = (
+        db.query(Customer)
+        .all()
+    )
 
     return customers
 
 
-@router.get("/customers/{customer_id}", response_model=CustomerResponse)
-def get_customer(customer_id: int, db: Session = Depends(get_db)):
+# =====================================================
+# GET SINGLE CUSTOMER
+# =====================================================
+
+@router.get(
+    "/customers/{customer_id}",
+    response_model=CustomerResponse
+)
+def get_customer(
+    customer_id: int,
+    db: Session = Depends(get_db)
+):
 
     customer = (
         db.query(Customer)
-        .filter(Customer.customer_id == customer_id)
+        .filter(
+            Customer.customer_id == customer_id
+        )
         .first()
     )
 
     if customer is None:
+
         raise HTTPException(
             status_code=404,
             detail="Customer not found"
@@ -53,7 +90,14 @@ def get_customer(customer_id: int, db: Session = Depends(get_db)):
     return customer
 
 
-@router.put("/customers/{customer_id}", response_model=CustomerResponse)
+# =====================================================
+# UPDATE CUSTOMER
+# =====================================================
+
+@router.put(
+    "/customers/{customer_id}",
+    response_model=CustomerResponse
+)
 def update_customer(
     customer_id: int,
     customer: CustomerCreate,
@@ -62,11 +106,14 @@ def update_customer(
 
     existing_customer = (
         db.query(Customer)
-        .filter(Customer.customer_id == customer_id)
+        .filter(
+            Customer.customer_id == customer_id
+        )
         .first()
     )
 
     if existing_customer is None:
+
         raise HTTPException(
             status_code=404,
             detail="Customer not found"
@@ -75,6 +122,7 @@ def update_customer(
     existing_customer.name = customer.name
     existing_customer.email = customer.email
     existing_customer.phone = customer.phone
+    existing_customer.area = customer.area
 
     db.commit()
     db.refresh(existing_customer)
@@ -82,16 +130,28 @@ def update_customer(
     return existing_customer
 
 
-@router.delete("/customers/{customer_id}")
-def delete_customer(customer_id: int, db: Session = Depends(get_db)):
+# =====================================================
+# DELETE CUSTOMER
+# =====================================================
+
+@router.delete(
+    "/customers/{customer_id}"
+)
+def delete_customer(
+    customer_id: int,
+    db: Session = Depends(get_db)
+):
 
     customer = (
         db.query(Customer)
-        .filter(Customer.customer_id == customer_id)
+        .filter(
+            Customer.customer_id == customer_id
+        )
         .first()
     )
 
     if customer is None:
+
         raise HTTPException(
             status_code=404,
             detail="Customer not found"
@@ -101,5 +161,6 @@ def delete_customer(customer_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {
-        "message": "Customer deleted successfully"
+        "message":
+        "Customer deleted successfully"
     }

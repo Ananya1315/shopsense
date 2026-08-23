@@ -9,6 +9,7 @@ function VendorDashboard({
   onDashboard,
   onProducts,
   onSales,
+  onAnalytics,
   onLogout
 }) {
 
@@ -28,7 +29,6 @@ function VendorDashboard({
       const token =
         localStorage.getItem("access_token");
 
-
       const response = await api.get(
         "/vendor/dashboard",
         {
@@ -38,13 +38,6 @@ function VendorDashboard({
         }
       );
 
-
-      console.log(
-        "Vendor dashboard:",
-        response.data
-      );
-
-
       setDashboard(response.data);
 
     } catch (error) {
@@ -53,7 +46,6 @@ function VendorDashboard({
         "Failed to fetch vendor dashboard:",
         error
       );
-
 
       setError(
         "Failed to load dashboard"
@@ -113,40 +105,51 @@ function VendorDashboard({
 
     <div className="vendor-layout">
 
-
       {/* =====================================
           SIDEBAR
       ====================================== */}
 
       <aside className="vendor-sidebar">
 
-
-        <h1 className="vendor-logo">
+        <h2 className="vendor-logo">
           ShopSense
-        </h1>
+        </h2>
+
+
         <nav className="vendor-nav">
 
-  <button
-    className="active"
-    onClick={onDashboard}
-  >
-    Dashboard
-  </button>
+          <button
+            className="active"
+            onClick={onDashboard}
+          >
+            Dashboard
+          </button>
 
-  <button
-    onClick={onProducts}
-  >
-    My Products
-  </button>
 
-  <button
-    onClick={onSales}
-  >
-    Sales
-  </button>
+          <button
+            onClick={onProducts}
+          >
+            My Products
+          </button>
 
-</nav>
 
+          <button
+            onClick={onSales}
+          >
+            Sales
+          </button>
+
+
+          <button
+            onClick={onAnalytics}
+          >
+            Customer Analytics
+          </button>
+
+        </nav>
+
+
+        {/* Logout */}
 
         <button
           className="vendor-logout"
@@ -154,7 +157,6 @@ function VendorDashboard({
         >
           Logout
         </button>
-
 
       </aside>
 
@@ -165,24 +167,21 @@ function VendorDashboard({
 
       <main className="vendor-main">
 
-
         <h1 className="vendor-page-title">
           Vendor Dashboard
         </h1>
 
 
         <p className="vendor-page-subtitle">
-          Welcome back,{" "}
-          {dashboard?.vendor_name || "Vendor"} 👋
+          Welcome back, {dashboard.vendor_name} 👋
         </p>
 
 
-        {/* ===================================
+        {/* =================================
             STATISTICS
-        ==================================== */}
+        ================================== */}
 
         <div className="vendor-stats">
-
 
           <div className="vendor-stat-card">
 
@@ -191,7 +190,7 @@ function VendorDashboard({
             </h3>
 
             <p>
-              {dashboard?.total_products ?? 0}
+              {dashboard.total_products}
             </p>
 
           </div>
@@ -204,7 +203,7 @@ function VendorDashboard({
             </h3>
 
             <p>
-              {dashboard?.total_sales ?? 0}
+              {dashboard.total_sales}
             </p>
 
           </div>
@@ -219,7 +218,7 @@ function VendorDashboard({
             <p>
               ₹{" "}
               {Number(
-                dashboard?.total_revenue ?? 0
+                dashboard.total_revenue
               ).toLocaleString("en-IN")}
             </p>
 
@@ -235,22 +234,20 @@ function VendorDashboard({
             <p>
               ₹{" "}
               {Number(
-                dashboard?.inventory_value ?? 0
+                dashboard.inventory_value
               ).toLocaleString("en-IN")}
             </p>
 
           </div>
 
-
         </div>
 
 
-        {/* ===================================
+        {/* =================================
             INVENTORY STATUS
-        ==================================== */}
+        ================================== */}
 
         <div className="vendor-section">
-
 
           <h2>
             Inventory Status
@@ -259,7 +256,6 @@ function VendorDashboard({
 
           <div className="vendor-stats">
 
-
             <div className="vendor-stat-card">
 
               <h3>
@@ -267,7 +263,7 @@ function VendorDashboard({
               </h3>
 
               <p>
-                {dashboard?.low_stock_count ?? 0}
+                {dashboard.low_stock_count}
               </p>
 
             </div>
@@ -280,24 +276,21 @@ function VendorDashboard({
               </h3>
 
               <p>
-                {dashboard?.total_products ?? 0}
+                {dashboard.total_products}
               </p>
 
             </div>
 
-
           </div>
-
 
         </div>
 
 
-        {/* ===================================
+        {/* =================================
             QUICK ACTIONS
-        ==================================== */}
+        ================================== */}
 
         <div className="vendor-section">
-
 
           <h2>
             Quick Actions
@@ -313,11 +306,7 @@ function VendorDashboard({
 
             <button
               className="vendor-primary-button"
-              onClick={() =>
-                alert(
-                  "Add Product functionality coming next."
-                )
-              }
+              onClick={onProducts}
             >
               + Add Product
             </button>
@@ -325,24 +314,16 @@ function VendorDashboard({
 
             <button
               className="vendor-action-button"
-              onClick={() =>
-                alert(
-                  "Product management coming next."
-                )
-              }
+              onClick={onProducts}
             >
               Manage Products
             </button>
 
-
           </div>
-
 
         </div>
 
-
       </main>
-
 
     </div>
 
