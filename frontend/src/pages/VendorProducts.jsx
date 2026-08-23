@@ -22,6 +22,10 @@ function VendorProducts({
   const [editingProduct, setEditingProduct] =
     useState(null);
 
+  // AI GENERATION LOADING STATE
+  const [generatingAI, setGeneratingAI] =
+    useState(false);
+
 
   const [form, setForm] = useState({
 
@@ -116,6 +120,118 @@ function VendorProducts({
 
 
   // =========================================
+  // GENERATE AI SEO CONTENT
+  // =========================================
+
+  const generateAIContent = async () => {
+
+    // Product name is required
+    if (!form.name.trim()) {
+
+      alert(
+        "Please enter the product name first."
+      );
+
+      return;
+
+    }
+
+
+    // Category is required
+    if (!form.category.trim()) {
+
+      alert(
+        "Please enter the category first."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      setGeneratingAI(true);
+
+
+      const token =
+        localStorage.getItem("access_token");
+
+
+      const response = await api.post(
+
+        "/vendor/products/generate-seo",
+
+        null,
+
+        {
+          params: {
+            product_name:
+              form.name,
+
+            category:
+              form.category
+          },
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+
+        }
+
+      );
+
+
+      // Put AI-generated values
+      // directly into the form
+
+      setForm((previous) => ({
+
+        ...previous,
+
+        description:
+          response.data.description || "",
+
+        seo_tags:
+          response.data.seo_tags || "",
+
+        seo_keywords:
+          response.data.seo_keywords || ""
+
+      }));
+
+
+      alert(
+        "AI content generated successfully!"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "AI content generation failed:",
+        error
+      );
+
+
+      alert(
+
+        error.response?.data?.detail ||
+
+        "Failed to generate AI content."
+
+      );
+
+    } finally {
+
+      setGeneratingAI(false);
+
+    }
+
+  };
+
+
+  // =========================================
   // OPEN ADD FORM
   // =========================================
 
@@ -150,7 +266,8 @@ function VendorProducts({
 
     setForm({
 
-      name: product.name || "",
+      name:
+        product.name || "",
 
       description:
         product.description || "",
@@ -194,7 +311,8 @@ function VendorProducts({
 
       const productData = {
 
-        name: form.name,
+        name:
+          form.name,
 
         description:
           form.description,
@@ -276,8 +394,11 @@ function VendorProducts({
       );
 
       alert(
+
         error.response?.data?.detail ||
+
         "Failed to save product."
+
       );
 
     }
@@ -337,8 +458,11 @@ function VendorProducts({
       );
 
       alert(
+
         error.response?.data?.detail ||
+
         "Failed to delete product."
+
       );
 
     }
@@ -416,8 +540,11 @@ function VendorProducts({
       );
 
       alert(
+
         error.response?.data?.detail ||
+
         "Failed to update stock."
+
       );
 
     }
@@ -432,9 +559,13 @@ function VendorProducts({
   if (loading) {
 
     return (
+
       <div className="vendor-loading">
+
         Loading products...
+
       </div>
+
     );
 
   }
@@ -467,7 +598,9 @@ function VendorProducts({
           </button>
 
 
-          <button className="active">
+          <button
+            className="active"
+          >
             My Products
           </button>
 
@@ -588,7 +721,9 @@ function VendorProducts({
                 products.map((product) => (
 
                   <tr
-                    key={product.product_id}
+                    key={
+                      product.product_id
+                    }
                   >
 
                     <td>
@@ -600,10 +735,15 @@ function VendorProducts({
                     </td>
 
                     <td>
+
                       ₹{" "}
+
                       {Number(
                         product.price
-                      ).toLocaleString("en-IN")}
+                      ).toLocaleString(
+                        "en-IN"
+                      )}
+
                     </td>
 
                     <td>
@@ -639,7 +779,9 @@ function VendorProducts({
                         <button
                           className="vendor-action-button"
                           onClick={() =>
-                            openEditForm(product)
+                            openEditForm(
+                              product
+                            )
                           }
                         >
                           Edit
@@ -649,7 +791,9 @@ function VendorProducts({
                         <button
                           className="vendor-action-button"
                           onClick={() =>
-                            updateStock(product)
+                            updateStock(
+                              product
+                            )
                           }
                         >
                           Stock
@@ -706,6 +850,8 @@ function VendorProducts({
               >
 
 
+                {/* PRODUCT NAME */}
+
                 <label>
                   Product Name
                 </label>
@@ -718,6 +864,8 @@ function VendorProducts({
                 />
 
 
+                {/* CATEGORY */}
+
                 <label>
                   Category
                 </label>
@@ -729,6 +877,8 @@ function VendorProducts({
                   required
                 />
 
+
+                {/* PRICE */}
 
                 <label>
                   Price
@@ -745,6 +895,8 @@ function VendorProducts({
                 />
 
 
+                {/* STOCK */}
+
                 <label>
                   Stock
                 </label>
@@ -759,17 +911,57 @@ function VendorProducts({
                 />
 
 
-                <label>
-                  Description
-                </label>
+                {/* AI GENERATION */}
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: "10px",
+                    marginBottom: "8px"
+                  }}
+                >
+
+                  <label
+                    style={{
+                      margin: 0
+                    }}
+                  >
+                    Description
+                  </label>
+
+
+                  <button
+                    type="button"
+                    className="vendor-primary-button"
+                    onClick={generateAIContent}
+                    disabled={generatingAI}
+                    style={{
+                      padding: "8px 14px",
+                      fontSize: "14px"
+                    }}
+                  >
+
+                    {generatingAI
+                      ? "Generating..."
+                      : "✨ Generate AI Content"}
+
+                  </button>
+
+                </div>
+
 
                 <textarea
                   name="description"
                   value={form.description}
                   onChange={handleChange}
                   rows="4"
+                  placeholder="Leave empty and let AI generate the description."
                 />
 
+
+                {/* SEO TAGS */}
 
                 <label>
                   SEO Tags
@@ -783,6 +975,8 @@ function VendorProducts({
                 />
 
 
+                {/* SEO KEYWORDS */}
+
                 <label>
                   SEO Keywords
                 </label>
@@ -795,15 +989,19 @@ function VendorProducts({
                 />
 
 
+                {/* FORM BUTTONS */}
+
                 <div className="form-buttons">
 
                   <button
                     type="submit"
                     className="vendor-primary-button"
                   >
+
                     {editingProduct
                       ? "Update Product"
                       : "Add Product"}
+
                   </button>
 
 

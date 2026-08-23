@@ -23,7 +23,7 @@ from app.utils.security import (
     get_current_admin,
     get_current_vendor
 )
-
+from app.utils.ai import generate_product_content
 
 router = APIRouter()
 
@@ -94,7 +94,45 @@ def create_product(
 
     return new_product
 
+@router.post("/vendor/products/generate-seo")
+def generate_seo_content(
+    product_name: str,
+    category: str,
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
 
+    if not product_name.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Product name is required"
+        )
+
+    if not category.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Category is required"
+        )
+
+    try:
+
+        result = generate_product_content(
+            product_name=product_name,
+            category=category
+        )
+
+        return result
+
+    except Exception as error:
+
+        print(
+            "AI generation failed:",
+            error
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate AI product content"
+        )
 # =====================================================
 # ADMIN GET SINGLE PRODUCT
 # =====================================================
