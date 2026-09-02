@@ -585,9 +585,17 @@ function VendorCustomerAnalytics({
 
                       <td>
 
-                        <span className="vendor-status in-stock">
-                          Top Seller
-                        </span>
+                        <span
+  className={`vendor-status ${
+    product.total_sold >= 2
+      ? "in-stock"
+      : "low-stock"
+  }`}
+>
+  {product.total_sold >= 2
+    ? "Top Seller"
+    : "Recommended"}
+</span>
 
                       </td>
 

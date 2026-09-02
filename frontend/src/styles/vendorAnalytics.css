@@ -1,0 +1,152 @@
+/* =========================================
+   PERFORMANCE BENCHMARK
+========================================= */
+
+.benchmark-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 24px;
+
+  margin-top: 25px;
+
+}
+
+
+.benchmark-card {
+
+  background: #38384f;
+
+  border: 1px solid #55556f;
+
+  border-radius: 16px;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+
+}
+
+
+.benchmark-card h3 {
+
+  margin: 0 0 25px;
+
+  font-size: 21px;
+
+  color: white;
+
+}
+
+
+.benchmark-row {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 15px 0;
+
+  border-bottom: 1px solid #55556f;
+
+}
+
+
+.benchmark-row span {
+
+  color: #b8b8d0;
+
+  font-size: 16px;
+
+}
+
+
+.benchmark-row strong {
+
+  color: white;
+
+  font-size: 18px;
+
+}
+
+
+.benchmark-performance {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-top: 20px;
+
+  padding: 16px;
+
+  border-radius: 10px;
+
+  background: rgba(124, 92, 255, 0.15);
+
+}
+
+
+.benchmark-performance span {
+
+  color: #c8c8dc;
+
+  font-size: 16px;
+
+  font-weight: 500;
+
+}
+
+
+.benchmark-performance strong {
+
+  color: #9b7cff;
+
+  font-size: 22px;
+
+}
+
+
+@media (max-width: 800px) {
+
+  .benchmark-grid {
+
+    grid-template-columns: 1fr;
+
+  }
+
+}
+
+/* =========================================
+   CSV EXPORT
+========================================= */
+
+.vendor-export-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.vendor-export-button {
+  padding: 12px 20px;
+  border: 1px solid #777795;
+  border-radius: 9px;
+  background: #5d5d7c;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.vendor-export-button:hover {
+  background: #6a6a8d;
+  transform: translateY(-1px);
+}

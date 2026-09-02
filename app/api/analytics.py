@@ -1,7 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from typing import List
+
+import csv
+import io
 
 from app.database import get_db
 
@@ -9,13 +14,12 @@ from app.models.vendor import Vendor
 from app.models.product import Product
 from app.models.transaction import Transaction
 from app.models.customer import Customer
-
+from app.utils.security import get_current_vendor
 from app.schemas.product import ProductResponse
 from app.schemas.analytics import (
     VendorInventoryValueResponse,
     CustomerSegmentResponse
 )
-
 router = APIRouter()
 
 
@@ -478,3 +482,457 @@ def get_recommendations(
         }
         for row in recommendations
     ]
+
+
+# =====================================================
+# SALES BY PRODUCT
+# =====================================================
+
+@router.get("/analytics/sales-by-product")
+def get_sales_by_product(
+    db: Session = Depends(get_db)
+):
+
+    results = (
+        db.query(
+            Product.name.label("product_name"),
+            func.sum(Transaction.quantity).label("total_sold")
+        )
+        .join(
+            Transaction,
+            Transaction.product_id == Product.product_id
+        )
+        .group_by(
+            Product.product_id,
+            Product.name
+        )
+        .order_by(
+            desc("total_sold")
+        )
+        .all()
+    )
+
+    return [
+        {
+            "product_name": row.product_name,
+            "total_sold": row.total_sold or 0
+        }
+        for row in results
+    ]
+
+
+# =====================================================
+# REVENUE BY PRODUCT
+# =====================================================
+
+@router.get("/analytics/revenue-by-product")
+def get_revenue_by_product(
+    db: Session = Depends(get_db)
+):
+
+    results = (
+        db.query(
+            Product.name.label("product_name"),
+            func.sum(Transaction.total_amount).label("total_revenue")
+        )
+        .join(
+            Transaction,
+            Transaction.product_id == Product.product_id
+        )
+        .group_by(
+            Product.product_id,
+            Product.name
+        )
+        .order_by(
+            desc("total_revenue")
+        )
+        .all()
+    )
+
+    return [
+        {
+            "product_name": row.product_name,
+            "total_revenue": row.total_revenue or 0
+        }
+        for row in results
+    ]
+
+# =====================================================
+# VENDOR - SALES BY PRODUCT
+# =====================================================
+
+@router.get("/analytics/vendor/sales-by-product")
+def get_vendor_sales_by_product(
+    db: Session = Depends(get_db),
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
+
+    results = (
+        db.query(
+            Product.name.label("product_name"),
+            func.sum(Transaction.quantity).label("total_sold")
+        )
+        .join(
+            Transaction,
+            Transaction.product_id == Product.product_id
+        )
+        .filter(
+            Product.vendor_id == current_vendor.vendor_id
+        )
+        .group_by(
+            Product.product_id,
+            Product.name
+        )
+        .order_by(
+            desc("total_sold")
+        )
+        .all()
+    )
+
+    return [
+        {
+            "product_name": row.product_name,
+            "total_sold": row.total_sold or 0
+        }
+        for row in results
+    ]
+
+
+# =====================================================
+# VENDOR - REVENUE BY PRODUCT
+# =====================================================
+
+@router.get("/analytics/vendor/revenue-by-product")
+def get_vendor_revenue_by_product(
+    db: Session = Depends(get_db),
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
+
+    results = (
+        db.query(
+            Product.name.label("product_name"),
+            func.sum(Transaction.total_amount).label("total_revenue")
+        )
+        .join(
+            Transaction,
+            Transaction.product_id == Product.product_id
+        )
+        .filter(
+            Product.vendor_id == current_vendor.vendor_id
+        )
+        .group_by(
+            Product.product_id,
+            Product.name
+        )
+        .order_by(
+            desc("total_revenue")
+        )
+        .all()
+    )
+
+    return [
+        {
+            "product_name": row.product_name,
+            "total_revenue": row.total_revenue or 0
+        }
+        for row in results
+    ]
+
+# =====================================================
+# VENDOR - MARKETPLACE BENCHMARKING
+# =====================================================
+
+@router.get("/analytics/vendor/benchmark")
+def get_vendor_benchmark(
+    db: Session = Depends(get_db),
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
+
+    # -------------------------------------------------
+    # CURRENT VENDOR SALES
+    # -------------------------------------------------
+
+    vendor_sales = (
+        db.query(
+            func.sum(Transaction.quantity)
+        )
+        .join(
+            Product,
+            Product.product_id == Transaction.product_id
+        )
+        .filter(
+            Product.vendor_id == current_vendor.vendor_id
+        )
+        .scalar()
+    ) or 0
+
+
+    # -------------------------------------------------
+    # CURRENT VENDOR REVENUE
+    # -------------------------------------------------
+
+    vendor_revenue = (
+        db.query(
+            func.sum(Transaction.total_amount)
+        )
+        .join(
+            Product,
+            Product.product_id == Transaction.product_id
+        )
+        .filter(
+            Product.vendor_id == current_vendor.vendor_id
+        )
+        .scalar()
+    ) or 0
+
+
+    # -------------------------------------------------
+    # SALES OF EACH VENDOR
+    # -------------------------------------------------
+
+    vendor_sales_data = (
+        db.query(
+            Vendor.vendor_id,
+            func.coalesce(
+                func.sum(Transaction.quantity),
+                0
+            ).label("total_sales")
+        )
+        .outerjoin(
+            Product,
+            Product.vendor_id == Vendor.vendor_id
+        )
+        .outerjoin(
+            Transaction,
+            Transaction.product_id == Product.product_id
+        )
+        .group_by(
+            Vendor.vendor_id
+        )
+        .all()
+    )
+
+
+    # -------------------------------------------------
+    # REVENUE OF EACH VENDOR
+    # -------------------------------------------------
+
+    vendor_revenue_data = (
+        db.query(
+            Vendor.vendor_id,
+            func.coalesce(
+                func.sum(Transaction.total_amount),
+                0
+            ).label("total_revenue")
+        )
+        .outerjoin(
+            Product,
+            Product.vendor_id == Vendor.vendor_id
+        )
+        .outerjoin(
+            Transaction,
+            Transaction.product_id == Product.product_id
+        )
+        .group_by(
+            Vendor.vendor_id
+        )
+        .all()
+    )
+
+
+    # -------------------------------------------------
+    # MARKETPLACE AVERAGES
+    # -------------------------------------------------
+
+    if vendor_sales_data:
+
+        marketplace_average_sales = (
+            sum(
+                row.total_sales
+                for row in vendor_sales_data
+            )
+            / len(vendor_sales_data)
+        )
+
+    else:
+
+        marketplace_average_sales = 0
+
+
+    if vendor_revenue_data:
+
+        marketplace_average_revenue = (
+            sum(
+                row.total_revenue
+                for row in vendor_revenue_data
+            )
+            / len(vendor_revenue_data)
+        )
+
+    else:
+
+        marketplace_average_revenue = 0
+
+
+    # -------------------------------------------------
+    # PERFORMANCE %
+    #
+    # Positive = above marketplace average
+    # Negative = below marketplace average
+    # -------------------------------------------------
+
+    if marketplace_average_sales > 0:
+
+        sales_performance = (
+            (
+                vendor_sales -
+                marketplace_average_sales
+            )
+            /
+            marketplace_average_sales
+        ) * 100
+
+    else:
+
+        sales_performance = 0
+
+
+    if marketplace_average_revenue > 0:
+
+        revenue_performance = (
+            (
+                float(vendor_revenue) -
+                float(marketplace_average_revenue)
+            )
+            /
+            float(marketplace_average_revenue)
+        ) * 100
+
+    else:
+
+        revenue_performance = 0
+
+
+    # -------------------------------------------------
+    # RESPONSE
+    # -------------------------------------------------
+
+    return {
+
+        "vendor_id":
+            current_vendor.vendor_id,
+
+        "vendor_name":
+            current_vendor.name,
+
+        "vendor_total_sales":
+            vendor_sales,
+
+        "marketplace_average_sales":
+            round(
+                marketplace_average_sales,
+                2
+            ),
+
+        "sales_performance_percentage":
+            round(
+                sales_performance,
+                2
+            ),
+
+        "vendor_total_revenue":
+            float(vendor_revenue),
+
+        "marketplace_average_revenue":
+            round(
+                float(marketplace_average_revenue),
+                2
+            ),
+
+        "revenue_performance_percentage":
+            round(
+                revenue_performance,
+                2
+            )
+    }
+
+
+# =====================================================
+# VENDOR - EXPORT ANALYTICS CSV
+# =====================================================
+
+@router.get("/analytics/vendor/export-csv")
+def export_vendor_analytics_csv(
+    db: Session = Depends(get_db),
+    current_vendor: Vendor = Depends(get_current_vendor)
+):
+
+    results = (
+        db.query(
+            Product.name.label("product_name"),
+            func.coalesce(
+                func.sum(Transaction.quantity),
+                0
+            ).label("total_sold"),
+            func.coalesce(
+                func.sum(Transaction.total_amount),
+                0
+            ).label("total_revenue")
+        )
+        .outerjoin(
+            Transaction,
+            Transaction.product_id == Product.product_id
+        )
+        .filter(
+            Product.vendor_id == current_vendor.vendor_id
+        )
+        .group_by(
+            Product.product_id,
+            Product.name
+        )
+        .order_by(
+            desc("total_sold")
+        )
+        .all()
+    )
+
+    # -----------------------------------------
+    # CREATE CSV IN MEMORY
+    # -----------------------------------------
+
+    output = io.StringIO()
+
+    writer = csv.writer(output)
+
+    writer.writerow([
+        "Product",
+        "Units Sold",
+        "Revenue"
+    ])
+
+    for row in results:
+
+        writer.writerow([
+            row.product_name,
+            row.total_sold or 0,
+            float(row.total_revenue or 0)
+        ])
+
+    # -----------------------------------------
+    # PREPARE FILE
+    # -----------------------------------------
+
+    output.seek(0)
+
+    filename = (
+        f"{current_vendor.name}_analytics.csv"
+    )
+
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition":
+                f'attachment; filename="{filename}"'
+        }
+    )

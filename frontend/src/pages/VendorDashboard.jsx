@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+
 import api from "../api/axios";
 
 import "../styles/dashboard.css";
@@ -10,6 +11,7 @@ function VendorDashboard({
   onProducts,
   onSales,
   onAnalytics,
+  onVendorAnalytics,
   onLogout
 }) {
 
@@ -144,6 +146,15 @@ function VendorDashboard({
             onClick={onAnalytics}
           >
             Customer Analytics
+          </button>
+
+
+          {/* NEW */}
+
+          <button
+            onClick={onVendorAnalytics}
+          >
+            My Analytics
           </button>
 
         </nav>
