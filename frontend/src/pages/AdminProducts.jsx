@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 
 import api from "../api/axios";
 
-import "../styles/adminProducts.css";
+import "../styles/AdminProducts.css";
 
 
 function AdminProducts({
   onDashboard,
   onVendors,
+  onAnalytics,
   onLogout
 }) {
 
@@ -96,7 +97,9 @@ function AdminProducts({
 
     <div className="dashboard">
 
-      {/* SIDEBAR */}
+      {/* =====================================
+          SIDEBAR
+      ====================================== */}
 
       <aside className="sidebar">
 
@@ -107,6 +110,8 @@ function AdminProducts({
 
         <nav>
 
+          {/* Dashboard */}
+
           <button
             className="nav-item"
             onClick={onDashboard}
@@ -114,6 +119,8 @@ function AdminProducts({
             Dashboard
           </button>
 
+
+          {/* Vendors */}
 
           <button
             className="nav-item"
@@ -123,17 +130,28 @@ function AdminProducts({
           </button>
 
 
-          <button className="nav-item active">
+          {/* Products */}
+
+          <button
+            className="nav-item active"
+          >
             Products
           </button>
 
 
-          <button className="nav-item">
+          {/* Analytics */}
+
+          <button
+            className="nav-item"
+            onClick={onAnalytics}
+          >
             Analytics
           </button>
 
         </nav>
 
+
+        {/* Logout */}
 
         <button
           className="logout-button"
@@ -145,7 +163,9 @@ function AdminProducts({
       </aside>
 
 
-      {/* MAIN CONTENT */}
+      {/* =====================================
+          MAIN CONTENT
+      ====================================== */}
 
       <main className="main-content">
 
@@ -166,7 +186,9 @@ function AdminProducts({
         </div>
 
 
-        {/* PRODUCT TABLE */}
+        {/* =====================================
+            PRODUCT TABLE
+        ====================================== */}
 
         <div className="product-table-container">
 

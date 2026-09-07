@@ -28,6 +28,7 @@ function AdminAnalytics({
   const [inventoryValue, setInventoryValue] = useState(0);
   const [lowStockCount, setLowStockCount] = useState(0);
   const [outOfStockCount, setOutOfStockCount] = useState(0);
+
   const [topVendor, setTopVendor] = useState(null);
   const [vendorInventory, setVendorInventory] = useState([]);
 
@@ -36,6 +37,10 @@ function AdminAnalytics({
 
   const [loading, setLoading] = useState(true);
 
+
+  /* =========================================
+     FETCH ANALYTICS
+  ========================================= */
 
   const fetchAnalytics = async () => {
 
@@ -134,6 +139,10 @@ function AdminAnalytics({
   }, []);
 
 
+  /* =========================================
+     LOADING
+  ========================================= */
+
   if (loading) {
 
     return (
@@ -149,7 +158,9 @@ function AdminAnalytics({
 
     <div className="dashboard">
 
-      {/* SIDEBAR */}
+      {/* =====================================
+          SIDEBAR
+      ====================================== */}
 
       <aside className="sidebar">
 
@@ -160,6 +171,8 @@ function AdminAnalytics({
 
         <nav>
 
+          {/* Dashboard */}
+
           <button
             className="nav-item"
             onClick={onDashboard}
@@ -167,6 +180,8 @@ function AdminAnalytics({
             Dashboard
           </button>
 
+
+          {/* Vendors */}
 
           <button
             className="nav-item"
@@ -176,6 +191,8 @@ function AdminAnalytics({
           </button>
 
 
+          {/* Products */}
+
           <button
             className="nav-item"
             onClick={onProducts}
@@ -184,8 +201,10 @@ function AdminAnalytics({
           </button>
 
 
+          {/* Analytics */}
+
           <button
-            className="nav-item"
+            className="nav-item active"
             onClick={onAnalytics}
           >
             Analytics
@@ -193,6 +212,8 @@ function AdminAnalytics({
 
         </nav>
 
+
+        {/* Logout */}
 
         <button
           className="logout-button"
@@ -204,7 +225,9 @@ function AdminAnalytics({
       </aside>
 
 
-      {/* MAIN CONTENT */}
+      {/* =====================================
+          MAIN CONTENT
+      ====================================== */}
 
       <main className="main-content">
 
@@ -225,7 +248,9 @@ function AdminAnalytics({
         </div>
 
 
-        {/* ANALYTICS CARDS */}
+        {/* =====================================
+            ANALYTICS CARDS
+        ====================================== */}
 
         <section className="analytics-grid">
 
@@ -292,7 +317,9 @@ function AdminAnalytics({
         </section>
 
 
-        {/* TOP VENDOR */}
+        {/* =====================================
+            TOP VENDOR
+        ====================================== */}
 
         <section className="analytics-section">
 
@@ -346,7 +373,9 @@ function AdminAnalytics({
         </section>
 
 
-        {/* INVENTORY BY VENDOR */}
+        {/* =====================================
+            INVENTORY BY VENDOR
+        ====================================== */}
 
         <section className="analytics-section">
 
@@ -425,7 +454,9 @@ function AdminAnalytics({
         </section>
 
 
-        {/* SALES BY PRODUCT */}
+        {/* =====================================
+            SALES BY PRODUCT
+        ====================================== */}
 
         <section className="analytics-section">
 
@@ -446,16 +477,16 @@ function AdminAnalytics({
 
               <ResponsiveContainer
                 width="100%"
-                height={380}
+                height={300}
               >
 
                 <BarChart
                   data={salesByProduct}
                   margin={{
-                    top: 20,
-                    right: 30,
-                    left: 10,
-                    bottom: 70
+                    top: 10,
+                    right: 20,
+                    left: 5,
+                    bottom: 35
                   }}
                 >
 
@@ -464,14 +495,16 @@ function AdminAnalytics({
                     stroke="rgba(255,255,255,0.12)"
                   />
 
+
                   <XAxis
                     dataKey="product_name"
-                    angle={-30}
+                    angle={-15}
                     textAnchor="end"
                     interval={0}
+                    height={50}
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 11
                     }}
                     axisLine={{
                       stroke: "#666681"
@@ -481,11 +514,12 @@ function AdminAnalytics({
                     }}
                   />
 
+
                   <YAxis
                     allowDecimals={false}
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 12
                     }}
                     axisLine={{
                       stroke: "#666681"
@@ -494,6 +528,7 @@ function AdminAnalytics({
                       stroke: "#666681"
                     }}
                   />
+
 
                   <Tooltip
                     contentStyle={{
@@ -507,17 +542,22 @@ function AdminAnalytics({
                     }}
                   />
 
+
                   <Legend
+                    verticalAlign="bottom"
+                    height={20}
                     wrapperStyle={{
-                      color: "#d8d7ed"
+                      color: "#d8d7ed",
+                      fontSize: "12px"
                     }}
                   />
+
 
                   <Bar
                     dataKey="total_sold"
                     name="Units Sold"
                     fill="#7c5cff"
-                    radius={[6, 6, 0, 0]}
+                    radius={[5, 5, 0, 0]}
                   />
 
                 </BarChart>
@@ -531,7 +571,9 @@ function AdminAnalytics({
         </section>
 
 
-        {/* REVENUE BY PRODUCT */}
+        {/* =====================================
+            REVENUE BY PRODUCT
+        ====================================== */}
 
         <section className="analytics-section">
 
@@ -552,16 +594,16 @@ function AdminAnalytics({
 
               <ResponsiveContainer
                 width="100%"
-                height={380}
+                height={300}
               >
 
                 <BarChart
                   data={revenueByProduct}
                   margin={{
-                    top: 20,
-                    right: 30,
-                    left: 10,
-                    bottom: 70
+                    top: 10,
+                    right: 20,
+                    left: 5,
+                    bottom: 35
                   }}
                 >
 
@@ -570,14 +612,16 @@ function AdminAnalytics({
                     stroke="rgba(255,255,255,0.12)"
                   />
 
+
                   <XAxis
                     dataKey="product_name"
-                    angle={-30}
+                    angle={-15}
                     textAnchor="end"
                     interval={0}
+                    height={50}
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 11
                     }}
                     axisLine={{
                       stroke: "#666681"
@@ -587,10 +631,11 @@ function AdminAnalytics({
                     }}
                   />
 
+
                   <YAxis
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 12
                     }}
                     axisLine={{
                       stroke: "#666681"
@@ -602,6 +647,7 @@ function AdminAnalytics({
                       `₹${Number(value).toLocaleString("en-IN")}`
                     }
                   />
+
 
                   <Tooltip
                     formatter={(value) =>
@@ -618,17 +664,22 @@ function AdminAnalytics({
                     }}
                   />
 
+
                   <Legend
+                    verticalAlign="bottom"
+                    height={20}
                     wrapperStyle={{
-                      color: "#d8d7ed"
+                      color: "#d8d7ed",
+                      fontSize: "12px"
                     }}
                   />
+
 
                   <Bar
                     dataKey="total_revenue"
                     name="Revenue"
                     fill="#9b7cff"
-                    radius={[6, 6, 0, 0]}
+                    radius={[5, 5, 0, 0]}
                   />
 
                 </BarChart>

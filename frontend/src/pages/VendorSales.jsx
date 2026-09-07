@@ -9,39 +9,36 @@ import "../styles/vendorProducts.css";
 function VendorSales({
   onDashboard,
   onProducts,
+  onSales,
+  onAnalytics,
+  onVendorAnalytics,
   onLogout
 }) {
 
-  const [dashboard, setDashboard] =
-    useState(null);
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(true);
 
-  const [error, setError] =
-    useState("");
-
+  // =========================================
+  // FETCH SALES DATA
+  // =========================================
 
   const fetchSalesData = async () => {
 
     try {
 
       const token =
-        localStorage.getItem(
-          "access_token"
-        );
-
+        localStorage.getItem("access_token");
 
       const response = await api.get(
         "/vendor/dashboard",
         {
           headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-
 
       setDashboard(response.data);
 
@@ -52,9 +49,7 @@ function VendorSales({
         error
       );
 
-      setError(
-        "Failed to load sales."
-      );
+      setError("Failed to load sales.");
 
     } finally {
 
@@ -72,6 +67,10 @@ function VendorSales({
   }, []);
 
 
+  // =========================================
+  // LOADING
+  // =========================================
+
   if (loading) {
 
     return (
@@ -82,6 +81,10 @@ function VendorSales({
 
   }
 
+
+  // =========================================
+  // ERROR
+  // =========================================
 
   if (error) {
 
@@ -94,12 +97,17 @@ function VendorSales({
   }
 
 
+  // =========================================
+  // PAGE
+  // =========================================
+
   return (
 
     <div className="vendor-layout">
 
-
-      {/* SIDEBAR */}
+      {/* =====================================
+          SIDEBAR
+      ====================================== */}
 
       <aside className="vendor-sidebar">
 
@@ -124,8 +132,25 @@ function VendorSales({
           </button>
 
 
-          <button className="active">
+          <button
+            className="active"
+            onClick={onSales}
+          >
             Sales
+          </button>
+
+
+          <button
+            onClick={onAnalytics}
+          >
+            Customer Analytics
+          </button>
+
+
+          <button
+            onClick={onVendorAnalytics}
+          >
+            My Analytics
           </button>
 
         </nav>
@@ -141,58 +166,78 @@ function VendorSales({
       </aside>
 
 
-      {/* MAIN */}
+      {/* =====================================
+          MAIN CONTENT
+      ====================================== */}
 
       <main className="vendor-main">
 
-        <h1 className="vendor-page-title">
-          Sales
-        </h1>
+        <div className="vendor-header">
 
+          <h1 className="vendor-page-title">
+            Sales
+          </h1>
 
-        <p className="vendor-page-subtitle">
-          Track your sales and revenue.
-        </p>
-
-
-        <div className="vendor-stats">
-
-
-          <div className="vendor-stat-card">
-
-            <h3>
-              Total Sales
-            </h3>
-
-            <p>
-              {dashboard?.total_sales ?? 0}
-            </p>
-
-          </div>
-
-
-          <div className="vendor-stat-card">
-
-            <h3>
-              Total Revenue
-            </h3>
-
-            <p>
-              ₹{" "}
-              {Number(
-                dashboard?.total_revenue ?? 0
-              ).toLocaleString("en-IN")}
-            </p>
-
-          </div>
-
+          <p className="vendor-page-subtitle">
+            Track your sales and revenue.
+          </p>
 
         </div>
 
 
-        <div className="vendor-section">
+        {/* =================================
+            SALES OVERVIEW
+        ================================== */}
 
-          <h2>
+        <section className="vendor-section">
+
+          <h2 className="vendor-section-title">
+            Sales Overview
+          </h2>
+
+
+          <div className="vendor-stats">
+
+            <div className="vendor-stat-card">
+
+              <h3>
+                Total Sales
+              </h3>
+
+              <p>
+                {dashboard?.total_sales ?? 0}
+              </p>
+
+            </div>
+
+
+            <div className="vendor-stat-card">
+
+              <h3>
+                Total Revenue
+              </h3>
+
+              <p>
+                ₹{" "}
+                {Number(
+                  dashboard?.total_revenue ?? 0
+                ).toLocaleString("en-IN")}
+              </p>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        {/* =================================
+            SALES SUMMARY
+        ================================== */}
+
+        <section className="vendor-section">
+
+          <h2 className="vendor-section-title">
             Sales Summary
           </h2>
 
@@ -223,7 +268,7 @@ function VendorSales({
                 <tr>
 
                   <td>
-                    Total Products Sold
+                    Total Sales
                   </td>
 
                   <td>
@@ -254,8 +299,7 @@ function VendorSales({
 
           </div>
 
-        </div>
-
+        </section>
 
       </main>
 

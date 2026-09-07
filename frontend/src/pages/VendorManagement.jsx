@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import api from "../api/axios";
 
-import "../styles/vendorManagement.css";
+import "../styles/VendorManagement.css";
 ;
 
 

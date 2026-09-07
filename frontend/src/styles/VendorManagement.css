@@ -1,8 +1,17 @@
+/* =========================================
+   VENDOR MANAGEMENT PAGE
+========================================= */
+
 .management-page {
   min-height: 100vh;
   padding: 40px;
   background: var(--bg-primary);
 }
+
+
+/* =========================================
+   PAGE HEADER
+========================================= */
 
 .page-header {
   margin-bottom: 30px;
@@ -10,14 +19,23 @@
 
 .page-header h1 {
   font-size: 30px;
-  margin-bottom: 8px;
+  margin: 0 0 8px;
+  font-weight: 700;
 }
 
 .page-header p {
+  font-size: 15px;
+  margin: 0;
   color: var(--text-secondary);
 }
 
+
+/* =========================================
+   VENDOR TABLE
+========================================= */
+
 .vendor-table-container {
+  width: 100%;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -44,17 +62,28 @@
 
 .vendor-table td {
   color: var(--text-primary);
+  font-size: 15px;
 }
 
 .vendor-table tbody tr:last-child td {
   border-bottom: none;
 }
 
+.vendor-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+
+/* =========================================
+   STATUS BADGES
+========================================= */
+
 .status {
   display: inline-block;
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 12px;
+  font-weight: 600;
   text-transform: capitalize;
 }
 
@@ -73,9 +102,15 @@
   color: var(--danger);
 }
 
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
 .vendor-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .approve-button,
@@ -83,12 +118,14 @@
   padding: 7px 12px;
   border-radius: 6px;
   cursor: pointer;
-  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .approve-button {
   background: var(--accent-primary);
   border: none;
+  color: var(--text-primary);
 }
 
 .approve-button:hover {
@@ -105,15 +142,61 @@
   background: rgba(217, 108, 108, 0.1);
 }
 
+
+/* =========================================
+   NO ACTION
+========================================= */
+
 .no-action {
   color: var(--text-secondary);
 }
+
+
+/* =========================================
+   LOADING
+========================================= */
 
 .page-loading {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
   background: var(--bg-primary);
+  color: var(--text-secondary);
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 900px) {
+
+  .management-page {
+    padding: 28px;
+  }
+
+  .vendor-table th,
+  .vendor-table td {
+    padding: 12px;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .management-page {
+    padding: 20px;
+  }
+
+  .page-header h1 {
+    font-size: 24px;
+  }
+
+  .vendor-table th,
+  .vendor-table td {
+    white-space: nowrap;
+  }
+
 }

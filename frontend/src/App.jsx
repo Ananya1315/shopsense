@@ -277,6 +277,10 @@ function App() {
 // ADMIN APPLICATION
 // =====================================================
 
+// =====================================================
+// ADMIN APPLICATION
+// =====================================================
+
 function AdminApp({ onLogout }) {
 
   const [activePage, setActivePage] =
@@ -292,11 +296,7 @@ function AdminApp({ onLogout }) {
     return (
       <AdminDashboard
 
-        onDashboard={() =>
-          setActivePage("dashboard")
-        }
-
-        onVendors={() =>
+        onVendorManagement={() =>
           setActivePage("vendors")
         }
 
@@ -406,7 +406,6 @@ function AdminApp({ onLogout }) {
   return null;
 
 }
-
 
 // =====================================================
 // VENDOR APPLICATION

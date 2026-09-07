@@ -1,152 +1,217 @@
 /* =========================================
-   PERFORMANCE BENCHMARK
+   VENDOR ANALYTICS
 ========================================= */
 
-.benchmark-grid {
+.vendor-analytics-section {
+  margin-top: 30px;
+}
 
-  display: grid;
+.vendor-analytics-section h2 {
+  margin: 0 0 7px;
 
-  grid-template-columns: repeat(2, 1fr);
+  font-size: 20px;
+  font-weight: 600;
 
-  gap: 24px;
+  color: #f5f5f7;
+}
 
-  margin-top: 25px;
+.analytics-description {
+  margin: 0 0 15px;
 
+  color: #9292ad;
+  font-size: 13px;
 }
 
 
-.benchmark-card {
+/* =========================================
+   EXPORT
+========================================= */
+
+.vendor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+.vendor-export-button {
+  padding: 10px 15px;
+
+  border: 1px solid #666680;
+  border-radius: 8px;
+
+  background: #4a4a64;
+  color: white;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition: 0.2s ease;
+}
+
+.vendor-export-button:hover {
+  background: #5b5b77;
+}
+
+
+/* =========================================
+   CHART
+========================================= */
+
+.vendor-chart {
+  width: 100%;
+
+  padding: 16px;
+  box-sizing: border-box;
 
   background: #38384f;
 
   border: 1px solid #55556f;
+  border-radius: 12px;
+}
 
-  border-radius: 16px;
 
-  padding: 28px;
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.vendor-empty-state {
+  min-height: 220px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #9292ad;
+
+  font-size: 14px;
+}
+
+
+/* =========================================
+   BENCHMARK
+========================================= */
+
+.benchmark-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+
+  gap: 18px;
+
+  max-width: 950px;
+}
+
+.benchmark-card {
+  padding: 20px;
+
+  background: #38384f;
+
+  border: 1px solid #55556f;
+  border-radius: 12px;
 
   box-sizing: border-box;
-
 }
-
 
 .benchmark-card h3 {
+  margin: 0 0 18px;
 
-  margin: 0 0 25px;
+  font-size: 16px;
+  font-weight: 600;
 
-  font-size: 21px;
-
-  color: white;
-
+  color: #f5f5f7;
 }
-
 
 .benchmark-row {
-
   display: flex;
-
+  align-items: center;
   justify-content: space-between;
 
-  align-items: center;
+  gap: 20px;
 
-  padding: 15px 0;
+  padding: 11px 0;
 
-  border-bottom: 1px solid #55556f;
-
+  border-bottom: 1px solid #4d4d67;
 }
-
 
 .benchmark-row span {
-
-  color: #b8b8d0;
-
-  font-size: 16px;
-
+  color: #a9a9c4;
+  font-size: 13px;
 }
-
 
 .benchmark-row strong {
-
   color: white;
-
-  font-size: 18px;
-
+  font-size: 14px;
+  text-align: right;
 }
-
 
 .benchmark-performance {
-
   display: flex;
-
+  align-items: center;
   justify-content: space-between;
 
-  align-items: center;
-
-  margin-top: 20px;
-
-  padding: 16px;
-
-  border-radius: 10px;
-
-  background: rgba(124, 92, 255, 0.15);
-
+  margin-top: 14px;
+  padding-top: 4px;
 }
-
 
 .benchmark-performance span {
-
   color: #c8c8dc;
-
-  font-size: 16px;
-
-  font-weight: 500;
-
+  font-size: 13px;
 }
-
 
 .benchmark-performance strong {
-
-  color: #9b7cff;
-
-  font-size: 22px;
-
+  font-size: 16px;
 }
 
+.performance-positive {
+  color: #63d39b;
+}
+
+.performance-negative {
+  color: #ef7373;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
 
 @media (max-width: 800px) {
 
+  .vendor-header {
+    flex-direction: column;
+  }
+
+  .vendor-export-button {
+    align-self: flex-start;
+  }
+
   .benchmark-grid {
-
     grid-template-columns: 1fr;
-
   }
 
 }
 
-/* =========================================
-   CSV EXPORT
-========================================= */
 
-.vendor-export-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-  margin-bottom: 30px;
-}
+@media (max-width: 600px) {
 
-.vendor-export-button {
-  padding: 12px 20px;
-  border: 1px solid #777795;
-  border-radius: 9px;
-  background: #5d5d7c;
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
+  .vendor-chart {
+    padding: 10px;
+  }
 
-.vendor-export-button:hover {
-  background: #6a6a8d;
-  transform: translateY(-1px);
+  .benchmark-row {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 5px;
+  }
+
+  .benchmark-row strong {
+    text-align: left;
+  }
+
 }

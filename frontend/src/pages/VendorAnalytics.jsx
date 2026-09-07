@@ -13,6 +13,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 
+import "../styles/vendorDashboard.css";
 import "../styles/vendorAnalytics.css";
 
 
@@ -27,10 +28,6 @@ function VendorAnalytics({
 
   const [salesByProduct, setSalesByProduct] = useState([]);
   const [revenueByProduct, setRevenueByProduct] = useState([]);
-
-  // =========================================
-  // BENCHMARKING
-  // =========================================
 
   const [benchmark, setBenchmark] = useState(null);
 
@@ -55,7 +52,6 @@ function VendorAnalytics({
         benchmarkResponse
       ] = await Promise.all([
 
-        // Sales by product
         api.get(
           "/analytics/vendor/sales-by-product",
           {
@@ -65,7 +61,6 @@ function VendorAnalytics({
           }
         ),
 
-        // Revenue by product
         api.get(
           "/analytics/vendor/revenue-by-product",
           {
@@ -75,7 +70,6 @@ function VendorAnalytics({
           }
         ),
 
-        // Vendor benchmarking
         api.get(
           "/analytics/vendor/benchmark",
           {
@@ -92,11 +86,9 @@ function VendorAnalytics({
         salesResponse.data
       );
 
-
       setRevenueByProduct(
         revenueResponse.data
       );
-
 
       setBenchmark(
         benchmarkResponse.data
@@ -117,6 +109,8 @@ function VendorAnalytics({
     }
 
   };
+
+
   // =========================================
   // EXPORT ANALYTICS CSV
   // =========================================
@@ -128,25 +122,33 @@ function VendorAnalytics({
       const token =
         localStorage.getItem("access_token");
 
+
       const response = await api.get(
         "/analytics/vendor/export-csv",
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+
           responseType: "blob",
         }
       );
 
-      // Create downloadable file
-      const url = window.URL.createObjectURL(
-        new Blob([response.data], {
-          type: "text/csv",
-        })
-      );
+
+      const url =
+        window.URL.createObjectURL(
+          new Blob(
+            [response.data],
+            {
+              type: "text/csv",
+            }
+          )
+        );
+
 
       const link =
         document.createElement("a");
+
 
       link.href = url;
 
@@ -155,6 +157,7 @@ function VendorAnalytics({
         "vendor_analytics.csv"
       );
 
+
       document.body.appendChild(link);
 
       link.click();
@@ -162,6 +165,7 @@ function VendorAnalytics({
       link.remove();
 
       window.URL.revokeObjectURL(url);
+
 
     } catch (error) {
 
@@ -177,6 +181,7 @@ function VendorAnalytics({
     }
 
   };
+
 
   useEffect(() => {
 
@@ -199,6 +204,10 @@ function VendorAnalytics({
 
   }
 
+
+  // =========================================
+  // PAGE
+  // =========================================
 
   return (
 
@@ -271,24 +280,29 @@ function VendorAnalytics({
 
       <main className="vendor-main">
 
-        <h1 className="vendor-page-title">
-          My Analytics
-        </h1>
+        <div className="vendor-header">
+
+          <div>
+
+            <h1 className="vendor-page-title">
+              My Analytics
+            </h1>
+
+            <p className="vendor-page-subtitle">
+              Monitor the performance of your products.
+            </p>
+
+          </div>
 
 
-        <p className="vendor-page-subtitle">
-          Monitor the performance of your products.
-        </p>
-        <div className="vendor-export-container">
+          <button
+            className="vendor-export-button"
+            onClick={exportCSV}
+          >
+            📥 Export Analytics CSV
+          </button>
 
-  <button
-    className="vendor-export-button"
-    onClick={exportCSV}
-  >
-    📥 Export Analytics CSV
-  </button>
-
-</div>
+        </div>
 
 
         {/* =================================
@@ -300,6 +314,10 @@ function VendorAnalytics({
           <h2>
             Units Sold by My Products
           </h2>
+
+          <p className="analytics-description">
+            Compare the number of units sold across your products.
+          </p>
 
 
           <div className="vendor-chart">
@@ -314,32 +332,33 @@ function VendorAnalytics({
 
               <ResponsiveContainer
                 width="100%"
-                height={380}
+                height={300}
               >
 
                 <BarChart
                   data={salesByProduct}
                   margin={{
-                    top: 20,
-                    right: 30,
-                    left: 10,
-                    bottom: 70
+                    top: 10,
+                    right: 20,
+                    left: 5,
+                    bottom: 45
                   }}
                 >
 
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.12)"
+                    stroke="rgba(255,255,255,0.10)"
                   />
 
                   <XAxis
                     dataKey="product_name"
-                    angle={-30}
+                    angle={-15}
                     textAnchor="end"
                     interval={0}
+                    height={50}
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 11
                     }}
                   />
 
@@ -347,7 +366,7 @@ function VendorAnalytics({
                     allowDecimals={false}
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 11
                     }}
                   />
 
@@ -360,13 +379,19 @@ function VendorAnalytics({
                     }}
                   />
 
-                  <Legend />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={20}
+                    wrapperStyle={{
+                      fontSize: "12px"
+                    }}
+                  />
 
                   <Bar
                     dataKey="total_sold"
                     name="Units Sold"
                     fill="#7c5cff"
-                    radius={[6, 6, 0, 0]}
+                    radius={[5, 5, 0, 0]}
                   />
 
                 </BarChart>
@@ -390,6 +415,10 @@ function VendorAnalytics({
             Revenue by My Products
           </h2>
 
+          <p className="analytics-description">
+            Compare the revenue generated by each product.
+          </p>
+
 
           <div className="vendor-chart">
 
@@ -403,39 +432,40 @@ function VendorAnalytics({
 
               <ResponsiveContainer
                 width="100%"
-                height={380}
+                height={300}
               >
 
                 <BarChart
                   data={revenueByProduct}
                   margin={{
-                    top: 20,
-                    right: 30,
-                    left: 10,
-                    bottom: 70
+                    top: 10,
+                    right: 20,
+                    left: 5,
+                    bottom: 45
                   }}
                 >
 
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.12)"
+                    stroke="rgba(255,255,255,0.10)"
                   />
 
                   <XAxis
                     dataKey="product_name"
-                    angle={-30}
+                    angle={-15}
                     textAnchor="end"
                     interval={0}
+                    height={50}
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 11
                     }}
                   />
 
                   <YAxis
                     tick={{
                       fill: "#b8b8d1",
-                      fontSize: 13
+                      fontSize: 11
                     }}
                     tickFormatter={(value) =>
                       `₹${Number(value).toLocaleString("en-IN")}`
@@ -454,13 +484,19 @@ function VendorAnalytics({
                     }}
                   />
 
-                  <Legend />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={20}
+                    wrapperStyle={{
+                      fontSize: "12px"
+                    }}
+                  />
 
                   <Bar
                     dataKey="total_revenue"
                     name="Revenue"
                     fill="#9b7cff"
-                    radius={[6, 6, 0, 0]}
+                    radius={[5, 5, 0, 0]}
                   />
 
                 </BarChart>
@@ -484,8 +520,7 @@ function VendorAnalytics({
             Performance Benchmark
           </h2>
 
-
-          <p className="vendor-page-subtitle">
+          <p className="analytics-description">
             Compare your performance with the marketplace average.
           </p>
 
@@ -494,9 +529,7 @@ function VendorAnalytics({
 
             <div className="benchmark-grid">
 
-              {/* ==============================
-                  SALES BENCHMARK
-              =============================== */}
+              {/* SALES */}
 
               <div className="benchmark-card">
 
@@ -543,7 +576,15 @@ function VendorAnalytics({
                     Performance
                   </span>
 
-                  <strong>
+                  <strong
+                    className={
+                      Number(
+                        benchmark.sales_performance_percentage || 0
+                      ) >= 0
+                        ? "performance-positive"
+                        : "performance-negative"
+                    }
+                  >
                     {Number(
                       benchmark.sales_performance_percentage || 0
                     ).toLocaleString("en-IN", {
@@ -557,9 +598,7 @@ function VendorAnalytics({
               </div>
 
 
-              {/* ==============================
-                  REVENUE BENCHMARK
-              =============================== */}
+              {/* REVENUE */}
 
               <div className="benchmark-card">
 
@@ -608,7 +647,15 @@ function VendorAnalytics({
                     Performance
                   </span>
 
-                  <strong>
+                  <strong
+                    className={
+                      Number(
+                        benchmark.revenue_performance_percentage || 0
+                      ) >= 0
+                        ? "performance-positive"
+                        : "performance-negative"
+                    }
+                  >
                     {Number(
                       benchmark.revenue_performance_percentage || 0
                     ).toLocaleString("en-IN", {
@@ -626,15 +673,12 @@ function VendorAnalytics({
           ) : (
 
             <div className="vendor-empty-state">
-
               No benchmarking data available.
-
             </div>
 
           )}
 
         </section>
-
 
       </main>
 

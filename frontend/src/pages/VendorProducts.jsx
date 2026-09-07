@@ -8,9 +8,10 @@ import "../styles/vendorProducts.css";
 function VendorProducts({
   onDashboard,
   onSales,
+  onAnalytics,
+  onVendorAnalytics,
   onLogout
 }) {
-
   const [products, setProducts] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -589,31 +590,29 @@ function VendorProducts({
         </h1>
 
 
-        <nav className="vendor-nav">
+       <nav className="vendor-nav">
 
-          <button
-            onClick={onDashboard}
-          >
-            Dashboard
-          </button>
+  <button onClick={onDashboard}>
+    Dashboard
+  </button>
 
+  <button className="active">
+    My Products
+  </button>
 
-          <button
-            className="active"
-          >
-            My Products
-          </button>
+  <button onClick={onSales}>
+    Sales
+  </button>
 
+  <button onClick={onAnalytics}>
+    Customer Analytics
+  </button>
 
-          <button
-            onClick={onSales}
-          >
-            Sales
-          </button>
+  <button onClick={onVendorAnalytics}>
+    My Analytics
+  </button>
 
-        </nav>
-
-
+</nav>
         <button
           className="vendor-logout"
           onClick={onLogout}

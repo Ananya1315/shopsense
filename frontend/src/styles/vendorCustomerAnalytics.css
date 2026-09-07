@@ -1,0 +1,141 @@
+/* =========================================
+   CUSTOMER ANALYTICS
+========================================= */
+
+.analytics-section-description {
+  margin: -7px 0 18px;
+
+  color: #9292ad;
+  font-size: 13px;
+}
+
+
+/* =========================================
+   EMPTY TABLE
+========================================= */
+
+.empty-analytics {
+  padding: 40px !important;
+
+  text-align: center !important;
+
+  color: #a9a9c4;
+  font-size: 14px;
+}
+
+
+/* =========================================
+   RECOMMENDATION CONTROLS
+========================================= */
+
+.recommendation-controls {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin: 20px 0;
+}
+
+.category-input {
+  width: 250px;
+
+  padding: 10px 12px;
+  box-sizing: border-box;
+
+  border: 1px solid #666680;
+  border-radius: 8px;
+
+  background: #29293c;
+  color: white;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition: 0.2s ease;
+}
+
+.category-input:focus {
+  border-color: #8888aa;
+  background: #2d2d42;
+}
+
+.category-input::placeholder {
+  color: #777791;
+}
+
+
+/* =========================================
+   RECOMMENDATION ERROR
+========================================= */
+
+.recommendation-error {
+  margin: 15px 0;
+
+  color: #ef7373;
+
+  font-size: 14px;
+}
+
+
+/* =========================================
+   EMPTY RECOMMENDATIONS
+========================================= */
+
+.analytics-empty-card {
+  padding: 22px;
+
+  background: #38384f;
+
+  border: 1px solid #55556f;
+  border-radius: 12px;
+}
+
+.analytics-empty-card h3 {
+  margin: 0 0 7px;
+
+  color: #f5f5f7;
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.analytics-empty-card p {
+  margin: 0;
+
+  color: #9292ad;
+
+  font-size: 13px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
+
+  .vendor-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .recommendation-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .category-input {
+    width: 100%;
+  }
+
+  .recommendation-controls .vendor-primary-button {
+    width: 100%;
+  }
+
+}

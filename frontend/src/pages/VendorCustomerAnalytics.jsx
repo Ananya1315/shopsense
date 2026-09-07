@@ -1,35 +1,28 @@
 import { useEffect, useState } from "react";
+
 import api from "../api/axios";
+
 import "../styles/vendorDashboard.css";
+import "../styles/vendorCustomerAnalytics.css";
 
 
 function VendorCustomerAnalytics({
   onDashboard,
   onProducts,
   onSales,
+  onAnalytics,
+  onVendorAnalytics,
   onLogout
 }) {
-
-  // =========================================
-  // CUSTOMER ANALYTICS
-  // =========================================
 
   const [customers, setCustomers] = useState([]);
 
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
+  const [category, setCategory] = useState("electronics");
 
-  // =========================================
-  // RECOMMENDATIONS
-  // =========================================
-
-  const [category, setCategory] =
-    useState("electronics");
-
-  const [recommendations, setRecommendations] =
-    useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
   const [recommendationLoading, setRecommendationLoading] =
     useState(false);
@@ -94,10 +87,10 @@ function VendorCustomerAnalytics({
 
     }
 
+
     try {
 
       setRecommendationLoading(true);
-
       setRecommendationError("");
 
       const token =
@@ -143,7 +136,6 @@ function VendorCustomerAnalytics({
   useEffect(() => {
 
     fetchCustomerAnalytics();
-
     fetchRecommendations();
 
   }, []);
@@ -180,7 +172,30 @@ function VendorCustomerAnalytics({
 
 
   // =========================================
-  // DASHBOARD
+  // CUSTOMER COUNTS
+  // =========================================
+
+  const highValueCustomers =
+    customers.filter(
+      (customer) =>
+        customer.segment === "High Value"
+    ).length;
+
+  const mediumValueCustomers =
+    customers.filter(
+      (customer) =>
+        customer.segment === "Medium Value"
+    ).length;
+
+  const lowValueCustomers =
+    customers.filter(
+      (customer) =>
+        customer.segment === "Low Value"
+    ).length;
+
+
+  // =========================================
+  // PAGE
   // =========================================
 
   return (
@@ -221,8 +236,18 @@ function VendorCustomerAnalytics({
           </button>
 
 
-          <button className="active">
+          <button
+            className="active"
+            onClick={onAnalytics}
+          >
             Customer Analytics
+          </button>
+
+
+          <button
+            onClick={onVendorAnalytics}
+          >
+            My Analytics
           </button>
 
         </nav>
@@ -244,100 +269,101 @@ function VendorCustomerAnalytics({
 
       <main className="vendor-main">
 
-        <h1 className="vendor-page-title">
-          Customer Analytics
-        </h1>
+        <div className="vendor-header">
 
+          <h1 className="vendor-page-title">
+            Customer Analytics
+          </h1>
 
-        <p className="vendor-page-subtitle">
-          Understand customer spending behavior and segments.
-        </p>
+          <p className="vendor-page-subtitle">
+            Understand customer spending behavior and segments.
+          </p>
+
+        </div>
 
 
         {/* =================================
-            SUMMARY CARDS
+            SUMMARY
         ================================== */}
 
-        <div className="vendor-stats">
+        <section className="vendor-section">
 
-          <div className="vendor-stat-card">
-
-            <h3>
-              Total Customers
-            </h3>
-
-            <p>
-              {customers.length}
-            </p>
-
-          </div>
+          <h2 className="vendor-section-title">
+            Customer Overview
+          </h2>
 
 
-          <div className="vendor-stat-card">
+          <div className="vendor-stats">
 
-            <h3>
-              High Value Customers
-            </h3>
+            <div className="vendor-stat-card">
 
-            <p>
-              {
-                customers.filter(
-                  (customer) =>
-                    customer.segment === "High Value"
-                ).length
-              }
-            </p>
+              <h3>
+                Total Customers
+              </h3>
 
-          </div>
+              <p>
+                {customers.length}
+              </p>
+
+            </div>
 
 
-          <div className="vendor-stat-card">
+            <div className="vendor-stat-card">
 
-            <h3>
-              Medium Value Customers
-            </h3>
+              <h3>
+                High Value Customers
+              </h3>
 
-            <p>
-              {
-                customers.filter(
-                  (customer) =>
-                    customer.segment === "Medium Value"
-                ).length
-              }
-            </p>
+              <p>
+                {highValueCustomers}
+              </p>
 
-          </div>
+            </div>
 
 
-          <div className="vendor-stat-card">
+            <div className="vendor-stat-card">
 
-            <h3>
-              Low Value Customers
-            </h3>
+              <h3>
+                Medium Value Customers
+              </h3>
 
-            <p>
-              {
-                customers.filter(
-                  (customer) =>
-                    customer.segment === "Low Value"
-                ).length
-              }
-            </p>
+              <p>
+                {mediumValueCustomers}
+              </p>
+
+            </div>
+
+
+            <div className="vendor-stat-card">
+
+              <h3>
+                Low Value Customers
+              </h3>
+
+              <p>
+                {lowValueCustomers}
+              </p>
+
+            </div>
 
           </div>
 
-        </div>
+        </section>
 
 
         {/* =================================
             CUSTOMER SEGMENTATION
         ================================== */}
 
-        <div className="vendor-section">
+        <section className="vendor-section">
 
-          <h2>
+          <h2 className="vendor-section-title">
             Customer Segmentation
           </h2>
+
+          <p className="analytics-section-description">
+            Customers grouped according to their spending behavior.
+          </p>
 
 
           <div className="vendor-table-container">
@@ -379,62 +405,79 @@ function VendorCustomerAnalytics({
 
               <tbody>
 
-                {customers.map((customer) => (
+                {customers.length === 0 ? (
 
-                  <tr
-                    key={customer.customer_id}
-                  >
+                  <tr>
 
-                    <td>
-                      {customer.customer_name}
-                    </td>
-
-
-                    <td>
-                      {customer.area}
-                    </td>
-
-
-                    <td>
-                      {customer.total_orders}
-                    </td>
-
-
-                    <td>
-                      ₹{" "}
-                      {Number(
-                        customer.total_spent
-                      ).toLocaleString("en-IN")}
-                    </td>
-
-
-                    <td>
-                      ₹{" "}
-                      {Number(
-                        customer.average_order_value
-                      ).toLocaleString("en-IN")}
-                    </td>
-
-
-                    <td>
-
-                      <span
-                        className={`vendor-status ${
-                          customer.segment === "High Value"
-                            ? "in-stock"
-                            : customer.segment === "Medium Value"
-                            ? "low-stock"
-                            : "out-stock"
-                        }`}
-                      >
-                        {customer.segment}
-                      </span>
-
+                    <td
+                      colSpan="6"
+                      className="empty-analytics"
+                    >
+                      No customer data available.
                     </td>
 
                   </tr>
 
-                ))}
+                ) : (
+
+                  customers.map((customer) => (
+
+                    <tr
+                      key={customer.customer_id}
+                    >
+
+                      <td>
+                        {customer.customer_name}
+                      </td>
+
+
+                      <td>
+                        {customer.area}
+                      </td>
+
+
+                      <td>
+                        {customer.total_orders}
+                      </td>
+
+
+                      <td>
+                        ₹{" "}
+                        {Number(
+                          customer.total_spent
+                        ).toLocaleString("en-IN")}
+                      </td>
+
+
+                      <td>
+                        ₹{" "}
+                        {Number(
+                          customer.average_order_value
+                        ).toLocaleString("en-IN")}
+                      </td>
+
+
+                      <td>
+
+                        <span
+                          className={`vendor-status ${
+                            customer.segment === "High Value"
+                              ? "in-stock"
+                              : customer.segment === "Medium Value"
+                              ? "low-stock"
+                              : "out-stock"
+                          }`}
+                        >
+                          {customer.segment}
+                        </span>
+
+                      </td>
+
+                    </tr>
+
+                  ))
+
+                )}
 
               </tbody>
 
@@ -442,36 +485,27 @@ function VendorCustomerAnalytics({
 
           </div>
 
-        </div>
+        </section>
 
 
         {/* =================================
-            RULE-BASED RECOMMENDATIONS
+            PRODUCT RECOMMENDATIONS
         ================================== */}
 
-        <div className="vendor-section">
+        <section className="vendor-section">
 
-          <h2>
+          <h2 className="vendor-section-title">
             Product Recommendations
           </h2>
 
-
-          <p className="vendor-page-subtitle">
-            Top-selling products based on historical sales.
+          <p className="analytics-section-description">
+            View top-selling products based on historical sales.
           </p>
 
 
-          {/* Category input */}
+          {/* CATEGORY SEARCH */}
 
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              alignItems: "center",
-              marginBottom: "25px",
-              marginTop: "20px"
-            }}
-          >
+          <div className="recommendation-controls">
 
             <input
               type="text"
@@ -480,52 +514,35 @@ function VendorCustomerAnalytics({
                 setCategory(e.target.value)
               }
               placeholder="Enter category"
-              style={{
-                padding: "13px 16px",
-                borderRadius: "9px",
-                border: "1px solid #666680",
-                background: "#38384f",
-                color: "white",
-                fontSize: "16px",
-                outline: "none",
-                width: "250px"
-              }}
+              className="category-input"
             />
 
 
             <button
               className="vendor-primary-button"
               onClick={fetchRecommendations}
+              disabled={recommendationLoading}
             >
-              Get Recommendations
+              {recommendationLoading
+                ? "Loading..."
+                : "Get Recommendations"}
             </button>
 
           </div>
 
 
-          {/* Recommendation loading */}
-
-          {recommendationLoading && (
-
-            <div className="vendor-loading">
-              Loading recommendations...
-            </div>
-
-          )}
-
-
-          {/* Recommendation error */}
+          {/* RECOMMENDATION ERROR */}
 
           {recommendationError && (
 
-            <p>
+            <p className="recommendation-error">
               {recommendationError}
             </p>
 
           )}
 
 
-          {/* Recommendations table */}
+          {/* RECOMMENDATION TABLE */}
 
           {!recommendationLoading &&
             recommendations.length > 0 && (
@@ -586,16 +603,16 @@ function VendorCustomerAnalytics({
                       <td>
 
                         <span
-  className={`vendor-status ${
-    product.total_sold >= 2
-      ? "in-stock"
-      : "low-stock"
-  }`}
->
-  {product.total_sold >= 2
-    ? "Top Seller"
-    : "Recommended"}
-</span>
+                          className={`vendor-status ${
+                            product.total_sold >= 2
+                              ? "in-stock"
+                              : "low-stock"
+                          }`}
+                        >
+                          {product.total_sold >= 2
+                            ? "Top Seller"
+                            : "Recommended"}
+                        </span>
 
                       </td>
 
@@ -612,34 +629,27 @@ function VendorCustomerAnalytics({
           )}
 
 
-          {/* No recommendations */}
+          {/* NO RECOMMENDATIONS */}
 
           {!recommendationLoading &&
             !recommendationError &&
             recommendations.length === 0 && (
 
-            <div className="vendor-stat-card">
+            <div className="analytics-empty-card">
 
               <h3>
                 No Sales Data
               </h3>
 
-              <p
-                style={{
-                  fontSize: "16px",
-                  fontWeight: "400",
-                  color: "#b8b8d0"
-                }}
-              >
-                No historical sales were found
-                for this category.
+              <p>
+                No historical sales were found for this category.
               </p>
 
             </div>
 
           )}
 
-        </div>
+        </section>
 
       </main>
 

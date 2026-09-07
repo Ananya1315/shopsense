@@ -28,8 +28,7 @@ function VendorDashboard({
 
     try {
 
-      const token =
-        localStorage.getItem("access_token");
+      const token = localStorage.getItem("access_token");
 
       const response = await api.get(
         "/vendor/dashboard",
@@ -49,9 +48,7 @@ function VendorDashboard({
         error
       );
 
-      setError(
-        "Failed to load dashboard"
-      );
+      setError("Failed to load dashboard");
 
     } finally {
 
@@ -149,8 +146,6 @@ function VendorDashboard({
           </button>
 
 
-          {/* NEW */}
-
           <button
             onClick={onVendorAnalytics}
           >
@@ -178,90 +173,27 @@ function VendorDashboard({
 
       <main className="vendor-main">
 
-        <h1 className="vendor-page-title">
-          Vendor Dashboard
-        </h1>
+        <div className="vendor-header">
 
+          <h1 className="vendor-page-title">
+            Vendor Dashboard
+          </h1>
 
-        <p className="vendor-page-subtitle">
-          Welcome back, {dashboard.vendor_name} 👋
-        </p>
-
-
-        {/* =================================
-            STATISTICS
-        ================================== */}
-
-        <div className="vendor-stats">
-
-          <div className="vendor-stat-card">
-
-            <h3>
-              My Products
-            </h3>
-
-            <p>
-              {dashboard.total_products}
-            </p>
-
-          </div>
-
-
-          <div className="vendor-stat-card">
-
-            <h3>
-              Total Sales
-            </h3>
-
-            <p>
-              {dashboard.total_sales}
-            </p>
-
-          </div>
-
-
-          <div className="vendor-stat-card">
-
-            <h3>
-              Total Revenue
-            </h3>
-
-            <p>
-              ₹{" "}
-              {Number(
-                dashboard.total_revenue
-              ).toLocaleString("en-IN")}
-            </p>
-
-          </div>
-
-
-          <div className="vendor-stat-card">
-
-            <h3>
-              Inventory Value
-            </h3>
-
-            <p>
-              ₹{" "}
-              {Number(
-                dashboard.inventory_value
-              ).toLocaleString("en-IN")}
-            </p>
-
-          </div>
+          <p className="vendor-page-subtitle">
+            Welcome back, {dashboard.vendor_name} 👋
+          </p>
 
         </div>
 
 
         {/* =================================
-            INVENTORY STATUS
+            OVERVIEW STATISTICS
         ================================== */}
 
-        <div className="vendor-section">
+        <section className="vendor-section">
 
-          <h2>
-            Inventory Status
+          <h2 className="vendor-section-title">
+            Overview
           </h2>
 
 
@@ -270,11 +202,11 @@ function VendorDashboard({
             <div className="vendor-stat-card">
 
               <h3>
-                Low Stock Products
+                My Products
               </h3>
 
               <p>
-                {dashboard.low_stock_count}
+                {dashboard.total_products}
               </p>
 
             </div>
@@ -283,8 +215,99 @@ function VendorDashboard({
             <div className="vendor-stat-card">
 
               <h3>
-                Total Products
+                Total Sales
               </h3>
+
+              <p>
+                {dashboard.total_sales}
+              </p>
+
+            </div>
+
+
+            <div className="vendor-stat-card">
+
+              <h3>
+                Total Revenue
+              </h3>
+
+              <p>
+                ₹{" "}
+                {Number(
+                  dashboard.total_revenue
+                ).toLocaleString("en-IN")}
+              </p>
+
+            </div>
+
+
+            <div className="vendor-stat-card">
+
+              <h3>
+                Inventory Value
+              </h3>
+
+              <p>
+                ₹{" "}
+                {Number(
+                  dashboard.inventory_value
+                ).toLocaleString("en-IN")}
+              </p>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        {/* =================================
+            INVENTORY STATUS
+        ================================== */}
+
+        <section className="vendor-section">
+
+          <h2 className="vendor-section-title">
+            Inventory Status
+          </h2>
+
+
+          <div className="inventory-status-grid">
+
+            <div className="vendor-stat-card inventory-card">
+
+              <div>
+
+                <h3>
+                  Low Stock Products
+                </h3>
+
+                <span className="inventory-description">
+                  Products that need restocking
+                </span>
+
+              </div>
+
+              <p>
+                {dashboard.low_stock_count}
+              </p>
+
+            </div>
+
+
+            <div className="vendor-stat-card inventory-card">
+
+              <div>
+
+                <h3>
+                  Total Products
+                </h3>
+
+                <span className="inventory-description">
+                  Products currently listed
+                </span>
+
+              </div>
 
               <p>
                 {dashboard.total_products}
@@ -294,26 +317,21 @@ function VendorDashboard({
 
           </div>
 
-        </div>
+        </section>
 
 
         {/* =================================
             QUICK ACTIONS
         ================================== */}
 
-        <div className="vendor-section">
+        <section className="vendor-section">
 
-          <h2>
+          <h2 className="vendor-section-title">
             Quick Actions
           </h2>
 
 
-          <div
-            style={{
-              display: "flex",
-              gap: "15px"
-            }}
-          >
+          <div className="vendor-actions">
 
             <button
               className="vendor-primary-button"
@@ -332,7 +350,7 @@ function VendorDashboard({
 
           </div>
 
-        </div>
+        </section>
 
       </main>
 

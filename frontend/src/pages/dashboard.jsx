@@ -3,6 +3,7 @@ import api from "../api/axios";
 import "../styles/dashboard.css";
 
 function Dashboard({
+  onDashboard,
   onVendorManagement,
   onProducts,
   onAnalytics,
@@ -24,7 +25,10 @@ function Dashboard({
           },
         };
 
-        // Products
+        // =========================================
+        // TOTAL PRODUCTS
+        // =========================================
+
         const productsResponse = await api.get(
           "/analytics/total-products",
           config
@@ -34,15 +38,23 @@ function Dashboard({
           productsResponse.data.total_products
         );
 
-        // Vendors
+        // =========================================
+        // VENDORS
+        // =========================================
+
         const vendorsResponse = await api.get(
           "/vendors",
           config
         );
 
-        setTotalVendors(vendorsResponse.data.length);
+        setTotalVendors(
+          vendorsResponse.data.length
+        );
 
-        // Sales
+        // =========================================
+        // SALES + REVENUE
+        // =========================================
+
         let sales = 0;
         let revenue = 0;
 
@@ -58,8 +70,12 @@ function Dashboard({
               config
             );
 
-            sales += salesResponse.data.total_sales || 0;
-            revenue += revenueResponse.data.total_revenue || 0;
+            sales +=
+              salesResponse.data.total_sales || 0;
+
+            revenue +=
+              revenueResponse.data.total_revenue || 0;
+
           } catch (error) {
             console.error(
               `Failed to fetch analytics for vendor ${vendor.vendor_id}:`,
@@ -80,12 +96,16 @@ function Dashboard({
     };
 
     fetchDashboardData();
+
   }, []);
 
   return (
     <div className="dashboard">
 
-      {/* SIDEBAR */}
+      {/* =====================================
+          SIDEBAR
+      ====================================== */}
+
       <aside className="sidebar">
 
         <div className="logo">
@@ -94,9 +114,17 @@ function Dashboard({
 
         <nav>
 
-          <button className="nav-item active">
+          {/* Dashboard */}
+
+          <button
+            className="nav-item active"
+            onClick={onDashboard}
+          >
             Dashboard
           </button>
+
+
+          {/* Vendors */}
 
           <button
             className="nav-item"
@@ -105,20 +133,30 @@ function Dashboard({
             Vendors
           </button>
 
-          <button
-  className="nav-item"
-  onClick={onProducts}
->
-  Products
-</button>
+
+          {/* Products */}
 
           <button
-  className="nav-item"
-  onClick={onAnalytics}
->
-  Analytics
-</button>
+            className="nav-item"
+            onClick={onProducts}
+          >
+            Products
+          </button>
+
+
+          {/* Analytics */}
+
+          <button
+            className="nav-item"
+            onClick={onAnalytics}
+          >
+            Analytics
+          </button>
+
         </nav>
+
+
+        {/* Logout */}
 
         <button
           className="logout-button"
@@ -129,69 +167,80 @@ function Dashboard({
 
       </aside>
 
-      {/* MAIN CONTENT */}
+
+      {/* =====================================
+          MAIN CONTENT
+      ====================================== */}
+
       <main className="main-content">
 
         <header className="dashboard-header">
 
-          <div>
-            <h1>Admin Dashboard</h1>
+          <h1>
+            Admin Dashboard
+          </h1>
 
-            <p>
-              Welcome back, Admin 👋
-            </p>
-          </div>
+          <p>
+            Welcome back, Admin 👋
+          </p>
 
         </header>
 
-        {/* STAT CARDS */}
+
+        {/* =====================================
+            STATISTICS
+        ====================================== */}
+
         <section className="stats-grid">
 
           <div className="stat-card">
-            <p>Total Vendors</p>
-            <h2>{totalVendors}</h2>
+
+            <p>
+              Total Vendors
+            </p>
+
+            <h2>
+              {totalVendors}
+            </h2>
+
           </div>
 
-          <div className="stat-card">
-            <p>Total Products</p>
-            <h2>{totalProducts}</h2>
-          </div>
 
           <div className="stat-card">
-            <p>Total Sales</p>
-            <h2>{totalSales}</h2>
+
+            <p>
+              Total Products
+            </p>
+
+            <h2>
+              {totalProducts}
+            </h2>
+
           </div>
 
+
           <div className="stat-card">
-            <p>Total Revenue</p>
+
+            <p>
+              Total Sales
+            </p>
+
+            <h2>
+              {totalSales}
+            </h2>
+
+          </div>
+
+
+          <div className="stat-card">
+
+            <p>
+              Total Revenue
+            </p>
+
             <h2>
               ₹ {totalRevenue.toLocaleString("en-IN")}
             </h2>
-          </div>
-
-        </section>
-
-        {/* QUICK ACTIONS */}
-        <section className="dashboard-section">
-
-          <h2>Quick Actions</h2>
-
-          <div className="action-grid">
-
-            <button
-              className="action-card"
-              onClick={onVendorManagement}
-            >
-              + Add Vendor
-            </button>
-
-            <button className="action-card">
-              + Add Product
-            </button>
-
-            <button className="action-card">
-              View Products
-            </button>
 
           </div>
 
