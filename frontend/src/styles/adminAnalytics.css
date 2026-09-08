@@ -183,5 +183,57 @@
   .analytics-chart {
     padding: 10px;
   }
+}
+
+/* =========================================
+   VENDOR PERFORMANCE
+========================================= */
+
+.analytics-description {
+  margin: -2px 0 16px;
+
+  color: #9292ad;
+
+  font-size: 13px;
+}
+
+
+.vendor-performance-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+
+.vendor-performance-card {
+  padding: 18px;
+
+  background: var(--bg-secondary);
+
+  border: 1px solid var(--border);
+
+  border-radius: 12px;
+
+  box-sizing: border-box;
+}
+
+
+.vendor-performance-card h3 {
+  margin: 0 0 10px;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  color: var(--text-primary);
+}
+
+@media (max-width: 900px) {
+
+  .vendor-performance-grid {
+    grid-template-columns: 1fr;
+  }
 
 }

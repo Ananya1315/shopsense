@@ -32,19 +32,22 @@ function AdminAnalytics({
   const [topVendor, setTopVendor] = useState(null);
   const [vendorInventory, setVendorInventory] = useState([]);
 
-  const [salesByProduct, setSalesByProduct] = useState([]);
-  const [revenueByProduct, setRevenueByProduct] = useState([]);
+  const [vendorPerformance, setVendorPerformance] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
 
-  /* =========================================
-     FETCH ANALYTICS
-  ========================================= */
+  // =========================================
+  // FETCH ANALYTICS
+  // =========================================
 
   const fetchAnalytics = async () => {
 
     try {
+
+      // -----------------------------------------
+      // FETCH BASIC ANALYTICS
+      // -----------------------------------------
 
       const [
         avgPriceResponse,
@@ -53,8 +56,7 @@ function AdminAnalytics({
         outOfStockResponse,
         topVendorResponse,
         vendorInventoryResponse,
-        salesByProductResponse,
-        revenueByProductResponse
+        vendorsResponse
       ] = await Promise.all([
 
         api.get("/analytics/avg-price"),
@@ -69,12 +71,14 @@ function AdminAnalytics({
 
         api.get("/analytics/inventory-value-by-vendor"),
 
-        api.get("/analytics/sales-by-product"),
-
-        api.get("/analytics/revenue-by-product")
+        api.get("/vendors")
 
       ]);
 
+
+      // -----------------------------------------
+      // SET BASIC ANALYTICS
+      // -----------------------------------------
 
       setAveragePrice(
         avgPriceResponse.data.average_price || 0
@@ -106,13 +110,83 @@ function AdminAnalytics({
       );
 
 
-      setSalesByProduct(
-        salesByProductResponse.data
+      // -----------------------------------------
+      // FETCH SALES + REVENUE FOR EACH VENDOR
+      // -----------------------------------------
+
+      const vendors =
+        vendorsResponse.data;
+
+
+      const vendorData =
+        await Promise.all(
+
+          vendors.map(async (vendor) => {
+
+            try {
+
+              const [
+                salesResponse,
+                revenueResponse
+              ] = await Promise.all([
+
+                api.get(
+                  `/analytics/vendor/${vendor.vendor_id}/sales`
+                ),
+
+                api.get(
+                  `/analytics/vendor/${vendor.vendor_id}/revenue`
+                )
+
+              ]);
+
+
+              return {
+
+                vendor_name: vendor.name,
+
+                total_sales:
+                  salesResponse.data.total_sales || 0,
+
+                total_revenue:
+                  revenueResponse.data.total_revenue || 0
+
+              };
+
+            } catch (error) {
+
+              console.error(
+                `Failed to fetch analytics for vendor ${vendor.vendor_id}:`,
+                error
+              );
+
+
+              return {
+
+                vendor_name: vendor.name,
+
+                total_sales: 0,
+
+                total_revenue: 0
+
+              };
+
+            }
+
+          })
+
+        );
+
+
+      // Sort vendors by revenue
+      vendorData.sort(
+        (a, b) =>
+          b.total_revenue - a.total_revenue
       );
 
 
-      setRevenueByProduct(
-        revenueByProductResponse.data
+      setVendorPerformance(
+        vendorData
       );
 
 
@@ -139,24 +213,33 @@ function AdminAnalytics({
   }, []);
 
 
-  /* =========================================
-     LOADING
-  ========================================= */
+  // =========================================
+  // LOADING
+  // =========================================
 
   if (loading) {
 
     return (
+
       <div className="page-loading">
+
         Loading analytics...
+
       </div>
+
     );
 
   }
 
 
+  // =========================================
+  // PAGE
+  // =========================================
+
   return (
 
     <div className="dashboard">
+
 
       {/* =====================================
           SIDEBAR
@@ -171,8 +254,6 @@ function AdminAnalytics({
 
         <nav>
 
-          {/* Dashboard */}
-
           <button
             className="nav-item"
             onClick={onDashboard}
@@ -180,8 +261,6 @@ function AdminAnalytics({
             Dashboard
           </button>
 
-
-          {/* Vendors */}
 
           <button
             className="nav-item"
@@ -191,8 +270,6 @@ function AdminAnalytics({
           </button>
 
 
-          {/* Products */}
-
           <button
             className="nav-item"
             onClick={onProducts}
@@ -200,8 +277,6 @@ function AdminAnalytics({
             Products
           </button>
 
-
-          {/* Analytics */}
 
           <button
             className="nav-item active"
@@ -212,8 +287,6 @@ function AdminAnalytics({
 
         </nav>
 
-
-        {/* Logout */}
 
         <button
           className="logout-button"
@@ -230,6 +303,7 @@ function AdminAnalytics({
       ====================================== */}
 
       <main className="main-content">
+
 
         <div className="page-header">
 
@@ -254,6 +328,7 @@ function AdminAnalytics({
 
         <section className="analytics-grid">
 
+
           <div className="analytics-card">
 
             <p>
@@ -261,13 +336,16 @@ function AdminAnalytics({
             </p>
 
             <h2>
+
               ₹{" "}
+
               {averagePrice.toLocaleString(
                 "en-IN",
                 {
                   maximumFractionDigits: 2
                 }
               )}
+
             </h2>
 
           </div>
@@ -280,10 +358,13 @@ function AdminAnalytics({
             </p>
 
             <h2>
+
               ₹{" "}
+
               {inventoryValue.toLocaleString(
                 "en-IN"
               )}
+
             </h2>
 
           </div>
@@ -313,6 +394,7 @@ function AdminAnalytics({
             </h2>
 
           </div>
+
 
         </section>
 
@@ -352,10 +434,13 @@ function AdminAnalytics({
                 </p>
 
                 <h3>
+
                   ₹{" "}
+
                   {Number(
                     topVendor.inventory_value || 0
                   ).toLocaleString("en-IN")}
+
                 </h3>
 
               </div>
@@ -365,7 +450,9 @@ function AdminAnalytics({
           ) : (
 
             <div className="empty-state">
+
               No vendor data available.
+
             </div>
 
           )}
@@ -432,10 +519,13 @@ function AdminAnalytics({
                         </td>
 
                         <td>
+
                           ₹{" "}
+
                           {Number(
                             vendor.inventory_value || 0
                           ).toLocaleString("en-IN")}
+
                         </td>
 
                       </tr>
@@ -455,240 +545,245 @@ function AdminAnalytics({
 
 
         {/* =====================================
-            SALES BY PRODUCT
+            VENDOR PERFORMANCE
         ====================================== */}
 
         <section className="analytics-section">
 
           <h2>
-            Sales by Product
+            Vendor Performance
           </h2>
 
+          <p className="analytics-description">
+            Compare sales and revenue generated by each vendor.
+          </p>
 
-          <div className="analytics-chart">
 
-            {salesByProduct.length === 0 ? (
+          {vendorPerformance.length === 0 ? (
 
-              <div className="empty-state">
-                No sales data available.
-              </div>
+            <div className="empty-state">
+              No vendor performance data available.
+            </div>
 
-            ) : (
+          ) : (
 
-              <ResponsiveContainer
-                width="100%"
-                height={300}
-              >
+            <div className="vendor-performance-grid">
 
-                <BarChart
-                  data={salesByProduct}
-                  margin={{
-                    top: 10,
-                    right: 20,
-                    left: 5,
-                    bottom: 35
-                  }}
+
+              {/* =================================
+                  SALES BY VENDOR
+              ================================== */}
+
+              <div className="vendor-performance-card">
+
+                <h3>
+                  Sales by Vendor
+                </h3>
+
+
+                <ResponsiveContainer
+                  width="100%"
+                  height={300}
                 >
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.12)"
-                  />
-
-
-                  <XAxis
-                    dataKey="product_name"
-                    angle={-15}
-                    textAnchor="end"
-                    interval={0}
-                    height={50}
-                    tick={{
-                      fill: "#b8b8d1",
-                      fontSize: 11
+                  <BarChart
+                    data={vendorPerformance}
+                    margin={{
+                      top: 10,
+                      right: 15,
+                      left: 5,
+                      bottom: 35
                     }}
-                    axisLine={{
-                      stroke: "#666681"
-                    }}
-                    tickLine={{
-                      stroke: "#666681"
-                    }}
-                  />
+                  >
+
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="rgba(255,255,255,0.12)"
+                    />
 
 
-                  <YAxis
-                    allowDecimals={false}
-                    tick={{
-                      fill: "#b8b8d1",
-                      fontSize: 12
-                    }}
-                    axisLine={{
-                      stroke: "#666681"
-                    }}
-                    tickLine={{
-                      stroke: "#666681"
-                    }}
-                  />
+                    <XAxis
+                      dataKey="vendor_name"
+                      angle={-15}
+                      textAnchor="end"
+                      interval={0}
+                      height={50}
+                      tick={{
+                        fill: "#b8b8d1",
+                        fontSize: 11
+                      }}
+                      axisLine={{
+                        stroke: "#666681"
+                      }}
+                      tickLine={{
+                        stroke: "#666681"
+                      }}
+                    />
 
 
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#29283d",
-                      border: "1px solid #696783",
-                      borderRadius: "8px",
-                      color: "#ffffff"
-                    }}
-                    labelStyle={{
-                      color: "#ffffff"
-                    }}
-                  />
+                    <YAxis
+                      allowDecimals={false}
+                      tick={{
+                        fill: "#b8b8d1",
+                        fontSize: 12
+                      }}
+                      axisLine={{
+                        stroke: "#666681"
+                      }}
+                      tickLine={{
+                        stroke: "#666681"
+                      }}
+                    />
 
 
-                  <Legend
-                    verticalAlign="bottom"
-                    height={20}
-                    wrapperStyle={{
-                      color: "#d8d7ed",
-                      fontSize: "12px"
-                    }}
-                  />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#29283d",
+                        border: "1px solid #696783",
+                        borderRadius: "8px",
+                        color: "#ffffff"
+                      }}
+                      labelStyle={{
+                        color: "#ffffff"
+                      }}
+                    />
 
 
-                  <Bar
-                    dataKey="total_sold"
-                    name="Units Sold"
-                    fill="#7c5cff"
-                    radius={[5, 5, 0, 0]}
-                  />
-
-                </BarChart>
-
-              </ResponsiveContainer>
-
-            )}
-
-          </div>
-
-        </section>
+                    <Legend
+                      verticalAlign="bottom"
+                      height={20}
+                      wrapperStyle={{
+                        color: "#d8d7ed",
+                        fontSize: "12px"
+                      }}
+                    />
 
 
-        {/* =====================================
-            REVENUE BY PRODUCT
-        ====================================== */}
+                    <Bar
+                      dataKey="total_sales"
+                      name="Total Sales"
+                      fill="#7c5cff"
+                      radius={[5, 5, 0, 0]}
+                    />
 
-        <section className="analytics-section">
+                  </BarChart>
 
-          <h2>
-            Revenue by Product
-          </h2>
+                </ResponsiveContainer>
 
-
-          <div className="analytics-chart">
-
-            {revenueByProduct.length === 0 ? (
-
-              <div className="empty-state">
-                No revenue data available.
               </div>
 
-            ) : (
 
-              <ResponsiveContainer
-                width="100%"
-                height={300}
-              >
+              {/* =================================
+                  REVENUE BY VENDOR
+              ================================== */}
 
-                <BarChart
-                  data={revenueByProduct}
-                  margin={{
-                    top: 10,
-                    right: 20,
-                    left: 5,
-                    bottom: 35
-                  }}
+              <div className="vendor-performance-card">
+
+                <h3>
+                  Revenue by Vendor
+                </h3>
+
+
+                <ResponsiveContainer
+                  width="100%"
+                  height={300}
                 >
 
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="rgba(255,255,255,0.12)"
-                  />
-
-
-                  <XAxis
-                    dataKey="product_name"
-                    angle={-15}
-                    textAnchor="end"
-                    interval={0}
-                    height={50}
-                    tick={{
-                      fill: "#b8b8d1",
-                      fontSize: 11
+                  <BarChart
+                    data={vendorPerformance}
+                    margin={{
+                      top: 10,
+                      right: 15,
+                      left: 5,
+                      bottom: 35
                     }}
-                    axisLine={{
-                      stroke: "#666681"
-                    }}
-                    tickLine={{
-                      stroke: "#666681"
-                    }}
-                  />
+                  >
+
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="rgba(255,255,255,0.12)"
+                    />
 
 
-                  <YAxis
-                    tick={{
-                      fill: "#b8b8d1",
-                      fontSize: 12
-                    }}
-                    axisLine={{
-                      stroke: "#666681"
-                    }}
-                    tickLine={{
-                      stroke: "#666681"
-                    }}
-                    tickFormatter={(value) =>
-                      `₹${Number(value).toLocaleString("en-IN")}`
-                    }
-                  />
+                    <XAxis
+                      dataKey="vendor_name"
+                      angle={-15}
+                      textAnchor="end"
+                      interval={0}
+                      height={50}
+                      tick={{
+                        fill: "#b8b8d1",
+                        fontSize: 11
+                      }}
+                      axisLine={{
+                        stroke: "#666681"
+                      }}
+                      tickLine={{
+                        stroke: "#666681"
+                      }}
+                    />
 
 
-                  <Tooltip
-                    formatter={(value) =>
-                      `₹${Number(value).toLocaleString("en-IN")}`
-                    }
-                    contentStyle={{
-                      backgroundColor: "#29283d",
-                      border: "1px solid #696783",
-                      borderRadius: "8px",
-                      color: "#ffffff"
-                    }}
-                    labelStyle={{
-                      color: "#ffffff"
-                    }}
-                  />
+                    <YAxis
+                      tick={{
+                        fill: "#b8b8d1",
+                        fontSize: 12
+                      }}
+                      axisLine={{
+                        stroke: "#666681"
+                      }}
+                      tickLine={{
+                        stroke: "#666681"
+                      }}
+                      tickFormatter={(value) =>
+                        `₹${Number(value).toLocaleString("en-IN")}`
+                      }
+                    />
 
 
-                  <Legend
-                    verticalAlign="bottom"
-                    height={20}
-                    wrapperStyle={{
-                      color: "#d8d7ed",
-                      fontSize: "12px"
-                    }}
-                  />
+                    <Tooltip
+                      formatter={(value) =>
+                        `₹${Number(value).toLocaleString("en-IN")}`
+                      }
+                      contentStyle={{
+                        backgroundColor: "#29283d",
+                        border: "1px solid #696783",
+                        borderRadius: "8px",
+                        color: "#ffffff"
+                      }}
+                      labelStyle={{
+                        color: "#ffffff"
+                      }}
+                    />
 
 
-                  <Bar
-                    dataKey="total_revenue"
-                    name="Revenue"
-                    fill="#9b7cff"
-                    radius={[5, 5, 0, 0]}
-                  />
+                    <Legend
+                      verticalAlign="bottom"
+                      height={20}
+                      wrapperStyle={{
+                        color: "#d8d7ed",
+                        fontSize: "12px"
+                      }}
+                    />
 
-                </BarChart>
 
-              </ResponsiveContainer>
+                    <Bar
+                      dataKey="total_revenue"
+                      name="Total Revenue"
+                      fill="#9b7cff"
+                      radius={[5, 5, 0, 0]}
+                    />
 
-            )}
+                  </BarChart>
 
-          </div>
+                </ResponsiveContainer>
+
+              </div>
+
+
+            </div>
+
+          )}
 
         </section>
 
