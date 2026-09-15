@@ -1,11 +1,9 @@
 from sqlalchemy.orm import Session
-
 from fastapi import (
     APIRouter,
     Depends,
     HTTPException
 )
-
 from app.database import get_db
 
 from app.models.product import Product
@@ -28,10 +26,6 @@ from app.utils.ai import generate_product_content
 router = APIRouter()
 
 
-# =====================================================
-# ADMIN / GENERAL PRODUCT LIST
-# =====================================================
-
 @router.get(
     "/products",
     response_model=list[ProductResponse]
@@ -47,10 +41,6 @@ def get_products(
 
     return products
 
-
-# =====================================================
-# ADMIN CREATE PRODUCT
-# =====================================================
 
 @router.post(
     "/products",
@@ -78,14 +68,17 @@ def create_product(
         )
 
     new_product = Product(
-        vendor_id=product.vendor_id,
-        name=product.name,
-        description=product.description,
-        seo_tags=product.seo_tags,
-        seo_keywords=product.seo_keywords,
-        price=product.price,
-        stock=product.stock,
-        category=product.category
+        new_product = Product(
+    vendor_id=product.vendor_id,
+    name=product.name,
+    description=product.description,
+    seo_tags=product.seo_tags,
+    seo_keywords=product.seo_keywords,
+    price=product.price,
+    stock=product.stock,
+    category=product.category,
+    image_url=product.image_url
+)
     )
 
     db.add(new_product)
@@ -133,9 +126,6 @@ def generate_seo_content(
             status_code=500,
             detail="Failed to generate AI product content"
         )
-# =====================================================
-# ADMIN GET SINGLE PRODUCT
-# =====================================================
 
 @router.get(
     "/products/{product_id}",
@@ -164,9 +154,6 @@ def get_product(
     return product
 
 
-# =====================================================
-# VENDOR - GET OWN PRODUCTS
-# =====================================================
 
 @router.get(
     "/vendor/products",
@@ -189,9 +176,6 @@ def get_my_products(
     return products
 
 
-# =====================================================
-# VENDOR - CREATE PRODUCT
-# =====================================================
 
 @router.post(
     "/vendor/products",
@@ -205,9 +189,6 @@ def create_vendor_product(
 
     new_product = Product(
 
-        # IMPORTANT:
-        # vendor_id comes from JWT,
-        # NOT from frontend.
         vendor_id=current_vendor.vendor_id,
 
         name=product.name,
@@ -216,7 +197,8 @@ def create_vendor_product(
         seo_keywords=product.seo_keywords,
         price=product.price,
         stock=product.stock,
-        category=product.category
+        category=product.category,
+        image_url=product.image_url
     )
 
     db.add(new_product)
@@ -227,10 +209,6 @@ def create_vendor_product(
 
     return new_product
 
-
-# =====================================================
-# VENDOR - UPDATE OWN PRODUCT
-# =====================================================
 
 @router.put(
     "/vendor/products/{product_id}",
@@ -267,6 +245,7 @@ def update_vendor_product(
     product.price = product_data.price
     product.stock = product_data.stock
     product.category = product_data.category
+    product.image_url = product_data.image_url
 
     db.commit()
 
@@ -275,9 +254,6 @@ def update_vendor_product(
     return product
 
 
-# =====================================================
-# VENDOR - UPDATE STOCK
-# =====================================================
 
 @router.put(
     "/vendor/products/{product_id}/stock",
@@ -323,9 +299,6 @@ def update_product_stock(
     return product
 
 
-# =====================================================
-# VENDOR - DELETE OWN PRODUCT
-# =====================================================
 
 @router.delete(
     "/vendor/products/{product_id}"

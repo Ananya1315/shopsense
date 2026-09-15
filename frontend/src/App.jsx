@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import Login from "./pages/login";
+import Signup from "./pages/Signup";
 
 import AdminDashboard from "./pages/dashboard";
 import VendorManagement from "./pages/VendorManagement";
@@ -12,6 +13,10 @@ import VendorProducts from "./pages/VendorProducts";
 import VendorSales from "./pages/VendorSales";
 import VendorCustomerAnalytics from "./pages/VendorCustomerAnalytics";
 import VendorAnalytics from "./pages/VendorAnalytics";
+
+import CustomerShop from "./pages/CustomerShop";
+import CustomerCart from "./pages/CustomerCart";
+import CustomerOrders from "./pages/CustomerOrders";
 
 import "./App.css";
 import "./styles/dashboard.css";
@@ -29,6 +34,13 @@ function App() {
   );
 
   const [role, setRole] = useState(null);
+
+
+  // =========================================
+  // SIGNUP PAGE
+  // =========================================
+
+  const [showSignup, setShowSignup] = useState(false);
 
 
   // =========================================
@@ -71,9 +83,7 @@ function App() {
       );
 
       return null;
-
     }
-
   };
 
 
@@ -92,7 +102,6 @@ function App() {
       setRole(null);
 
       return;
-
     }
 
     const userRole =
@@ -116,7 +125,6 @@ function App() {
 
       setRole(null);
       setIsLoggedIn(false);
-
     }
 
   }, []);
@@ -138,7 +146,6 @@ function App() {
       );
 
       return;
-
     }
 
     const userRole =
@@ -163,12 +170,10 @@ function App() {
       setRole(null);
 
       return;
-
     }
 
     setRole(userRole);
     setIsLoggedIn(true);
-
   };
 
 
@@ -194,24 +199,47 @@ function App() {
 
     setRole(null);
     setIsLoggedIn(false);
-
+    setShowSignup(false);
   };
 
 
   // =========================================
-  // LOGIN PAGE
+  // LOGIN / SIGNUP PAGE
   // =========================================
 
   if (!isLoggedIn) {
+
+    // -----------------------------------------
+    // SHOW SIGNUP
+    // -----------------------------------------
+
+    if (showSignup) {
+
+      return (
+        <Signup
+          onBackToLogin={() =>
+            setShowSignup(false)
+          }
+        />
+      );
+    }
+
+
+    // -----------------------------------------
+    // SHOW LOGIN
+    // -----------------------------------------
 
     return (
       <Login
         onLoginSuccess={
           handleLoginSuccess
         }
+
+        onSignup={() =>
+          setShowSignup(true)
+        }
       />
     );
-
   }
 
 
@@ -226,7 +254,6 @@ function App() {
         Loading...
       </div>
     );
-
   }
 
 
@@ -241,7 +268,6 @@ function App() {
         onLogout={handleLogout}
       />
     );
-
   }
 
 
@@ -256,7 +282,20 @@ function App() {
         onLogout={handleLogout}
       />
     );
+  }
 
+
+  // =========================================
+  // CUSTOMER
+  // =========================================
+
+  if (role === "customer") {
+
+    return (
+      <CustomerApp
+        onLogout={handleLogout}
+      />
+    );
   }
 
 
@@ -269,13 +308,8 @@ function App() {
       Unknown user role.
     </div>
   );
-
 }
 
-
-// =====================================================
-// ADMIN APPLICATION
-// =====================================================
 
 // =====================================================
 // ADMIN APPLICATION
@@ -312,7 +346,6 @@ function AdminApp({ onLogout }) {
 
       />
     );
-
   }
 
 
@@ -341,7 +374,6 @@ function AdminApp({ onLogout }) {
 
       />
     );
-
   }
 
 
@@ -370,7 +402,6 @@ function AdminApp({ onLogout }) {
 
       />
     );
-
   }
 
 
@@ -399,13 +430,12 @@ function AdminApp({ onLogout }) {
 
       />
     );
-
   }
 
 
   return null;
-
 }
+
 
 // =====================================================
 // VENDOR APPLICATION
@@ -450,7 +480,6 @@ function VendorApp({ onLogout }) {
 
       />
     );
-
   }
 
 
@@ -483,7 +512,6 @@ function VendorApp({ onLogout }) {
 
       />
     );
-
   }
 
 
@@ -516,7 +544,6 @@ function VendorApp({ onLogout }) {
 
       />
     );
-
   }
 
 
@@ -549,7 +576,6 @@ function VendorApp({ onLogout }) {
 
       />
     );
-
   }
 
 
@@ -586,12 +612,233 @@ function VendorApp({ onLogout }) {
 
       />
     );
-
   }
 
 
   return null;
+}
 
+
+// =====================================================
+// CUSTOMER APPLICATION
+// =====================================================
+
+function CustomerApp({ onLogout }) {
+
+  const [activePage, setActivePage] =
+    useState("shop");
+
+  const [cart, setCart] =
+    useState([]);
+
+
+  // =========================================
+  // ADD TO CART
+  // =========================================
+
+  const handleAddToCart = (product) => {
+
+    setCart((currentCart) => {
+
+      const existingProduct =
+        currentCart.find(
+          (item) =>
+            item.product_id === product.product_id
+        );
+
+
+      if (existingProduct) {
+
+        return currentCart.map((item) => {
+
+          if (
+            item.product_id === product.product_id
+          ) {
+
+            if (
+              item.quantity >= product.stock
+            ) {
+              return item;
+            }
+
+            return {
+              ...item,
+              quantity: item.quantity + 1
+            };
+          }
+
+          return item;
+        });
+      }
+
+
+      return [
+        ...currentCart,
+        {
+          ...product,
+          quantity: 1
+        }
+      ];
+    });
+  };
+
+
+  // =========================================
+  // REMOVE FROM CART
+  // =========================================
+
+  const handleRemoveFromCart = (productId) => {
+
+    setCart((currentCart) =>
+      currentCart.filter(
+        (item) =>
+          item.product_id !== productId
+      )
+    );
+  };
+
+
+  // =========================================
+  // UPDATE QUANTITY
+  // =========================================
+
+  const handleUpdateQuantity = (
+    productId,
+    newQuantity
+  ) => {
+
+    setCart((currentCart) =>
+
+      currentCart.map((item) => {
+
+        if (
+          item.product_id === productId
+        ) {
+
+          if (newQuantity <= 0) {
+            return item;
+          }
+
+          if (
+            newQuantity > item.stock
+          ) {
+            return item;
+          }
+
+          return {
+            ...item,
+            quantity: newQuantity
+          };
+        }
+
+        return item;
+      })
+
+    );
+  };
+
+
+  // =========================================
+  // CLEAR CART
+  // =========================================
+
+  const handleClearCart = () => {
+
+    setCart([]);
+
+  };
+
+
+  // =========================================
+  // SHOP
+  // =========================================
+
+  if (activePage === "shop") {
+
+    return (
+      <CustomerShop
+
+        onCart={(product) => {
+
+          if (product) {
+            handleAddToCart(product);
+          }
+
+          setActivePage("cart");
+        }}
+
+        onOrders={() =>
+          setActivePage("orders")
+        }
+
+        onLogout={onLogout}
+
+      />
+    );
+  }
+
+
+  // =========================================
+  // CART
+  // =========================================
+
+  if (activePage === "cart") {
+
+    return (
+      <CustomerCart
+
+        cart={cart}
+
+        onShop={() =>
+          setActivePage("shop")
+        }
+
+        onOrders={() =>
+          setActivePage("orders")
+        }
+
+        onRemove={
+          handleRemoveFromCart
+        }
+
+        onUpdateQuantity={
+          handleUpdateQuantity
+        }
+
+        onClearCart={
+          handleClearCart
+        }
+
+        onLogout={onLogout}
+
+      />
+    );
+  }
+
+
+  // =========================================
+  // ORDERS
+  // =========================================
+
+ if (activePage === "orders") {
+
+  return (
+    <CustomerOrders
+      onShop={() =>
+        setActivePage("shop")
+      }
+
+      onCart={() =>
+        setActivePage("cart")
+      }
+
+      onLogout={onLogout}
+    />
+  );
+}
+
+
+  return null;
 }
 
 

@@ -50,8 +50,14 @@ class Product(Base):
     category = Column(
         String(100)
     )
-
+    image_url = Column(
+    String(500),
+    nullable=True
+)
+    
     created_at = Column(
         DateTime,
         default=datetime.utcnow
     )
+
+    

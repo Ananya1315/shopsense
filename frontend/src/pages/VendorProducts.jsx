@@ -5,6 +5,57 @@ import api from "../api/axios";
 import "../styles/vendorProducts.css";
 
 
+// =========================================
+// PRODUCT IMAGE COMPONENT
+// =========================================
+
+function ProductImage({ src, name, size = 58 }) {
+  const [imageError, setImageError] = useState(false);
+
+  if (!src || imageError) {
+    return (
+      <div
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          borderRadius: "10px",
+          background: "rgba(93, 34, 232, 0.12)",
+          border: "1px solid rgba(93, 34, 232, 0.25)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: size > 70 ? "28px" : "22px",
+          flexShrink: 0
+        }}
+      >
+        📦
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={name}
+      onError={() => setImageError(true)}
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        objectFit: "cover",
+        borderRadius: "10px",
+        border: "1px solid rgba(255,255,255,0.12)",
+        display: "block",
+        flexShrink: 0
+      }}
+    />
+  );
+}
+
+
+// =========================================
+// MAIN COMPONENT
+// =========================================
+
 function VendorProducts({
   onDashboard,
   onSales,
@@ -20,24 +71,25 @@ function VendorProducts({
 
   const [showForm, setShowForm] = useState(false);
 
-  const [editingProduct, setEditingProduct] =
-    useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
 
   // AI GENERATION LOADING STATE
-  const [generatingAI, setGeneratingAI] =
-    useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
 
+
+  // =========================================
+  // FORM STATE
+  // =========================================
 
   const [form, setForm] = useState({
-
     name: "",
     description: "",
     seo_tags: "",
     seo_keywords: "",
     price: "",
     stock: "",
-    category: ""
-
+    category: "",
+    image_url: ""
   });
 
 
@@ -46,25 +98,20 @@ function VendorProducts({
   // =========================================
 
   const fetchProducts = async () => {
-
     try {
-
       setLoading(true);
 
       const token =
         localStorage.getItem("access_token");
 
-
       const response = await api.get(
         "/vendor/products",
         {
           headers: {
-            Authorization:
-              `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         }
       );
-
 
       setProducts(response.data);
 
@@ -84,16 +131,12 @@ function VendorProducts({
     } finally {
 
       setLoading(false);
-
     }
-
   };
 
 
   useEffect(() => {
-
     fetchProducts();
-
   }, []);
 
 
@@ -108,15 +151,10 @@ function VendorProducts({
       value
     } = e.target;
 
-
     setForm((previous) => ({
-
       ...previous,
-
       [name]: value
-
     }));
-
   };
 
 
@@ -134,7 +172,6 @@ function VendorProducts({
       );
 
       return;
-
     }
 
 
@@ -146,7 +183,6 @@ function VendorProducts({
       );
 
       return;
-
     }
 
 
@@ -154,17 +190,13 @@ function VendorProducts({
 
       setGeneratingAI(true);
 
-
       const token =
         localStorage.getItem("access_token");
 
 
       const response = await api.post(
-
         "/vendor/products/generate-seo",
-
         null,
-
         {
           params: {
             product_name:
@@ -178,9 +210,7 @@ function VendorProducts({
             Authorization:
               `Bearer ${token}`
           }
-
         }
-
       );
 
 
@@ -188,7 +218,6 @@ function VendorProducts({
       // directly into the form
 
       setForm((previous) => ({
-
         ...previous,
 
         description:
@@ -199,7 +228,6 @@ function VendorProducts({
 
         seo_keywords:
           response.data.seo_keywords || ""
-
       }));
 
 
@@ -216,19 +244,14 @@ function VendorProducts({
 
 
       alert(
-
         error.response?.data?.detail ||
-
         "Failed to generate AI content."
-
       );
 
     } finally {
 
       setGeneratingAI(false);
-
     }
-
   };
 
 
@@ -241,19 +264,17 @@ function VendorProducts({
     setEditingProduct(null);
 
     setForm({
-
       name: "",
       description: "",
       seo_tags: "",
       seo_keywords: "",
       price: "",
       stock: "",
-      category: ""
-
+      category: "",
+      image_url: ""
     });
 
     setShowForm(true);
-
   };
 
 
@@ -266,7 +287,6 @@ function VendorProducts({
     setEditingProduct(product);
 
     setForm({
-
       name:
         product.name || "",
 
@@ -286,12 +306,13 @@ function VendorProducts({
         product.stock ?? "",
 
       category:
-        product.category || ""
+        product.category || "",
 
+      image_url:
+        product.image_url || ""
     });
 
     setShowForm(true);
-
   };
 
 
@@ -302,7 +323,6 @@ function VendorProducts({
   const handleSubmit = async (e) => {
 
     e.preventDefault();
-
 
     try {
 
@@ -331,27 +351,26 @@ function VendorProducts({
           Number(form.stock),
 
         category:
-          form.category
+          form.category,
 
+        image_url:
+          form.image_url.trim() || null
       };
 
 
       if (editingProduct) {
 
         await api.put(
-
           `/vendor/products/${editingProduct.product_id}`,
-
           productData,
-
           {
             headers: {
               Authorization:
                 `Bearer ${token}`
             }
           }
-
         );
+
 
         alert(
           "Product updated successfully!"
@@ -360,24 +379,20 @@ function VendorProducts({
       } else {
 
         await api.post(
-
           "/vendor/products",
-
           productData,
-
           {
             headers: {
               Authorization:
                 `Bearer ${token}`
             }
           }
-
         );
+
 
         alert(
           "Product added successfully!"
         );
-
       }
 
 
@@ -394,16 +409,12 @@ function VendorProducts({
         error
       );
 
+
       alert(
-
         error.response?.data?.detail ||
-
         "Failed to save product."
-
       );
-
     }
-
   };
 
 
@@ -431,16 +442,13 @@ function VendorProducts({
 
 
       await api.delete(
-
         `/vendor/products/${productId}`,
-
         {
           headers: {
             Authorization:
               `Bearer ${token}`
           }
         }
-
       );
 
 
@@ -458,16 +466,12 @@ function VendorProducts({
         error
       );
 
+
       alert(
-
         error.response?.data?.detail ||
-
         "Failed to delete product."
-
       );
-
     }
-
   };
 
 
@@ -503,7 +507,6 @@ function VendorProducts({
       );
 
       return;
-
     }
 
 
@@ -514,20 +517,16 @@ function VendorProducts({
 
 
       await api.put(
-
         `/vendor/products/${product.product_id}/stock`,
-
         {
           stock: stock
         },
-
         {
           headers: {
             Authorization:
               `Bearer ${token}`
           }
         }
-
       );
 
 
@@ -540,16 +539,12 @@ function VendorProducts({
         error
       );
 
+
       alert(
-
         error.response?.data?.detail ||
-
         "Failed to update stock."
-
       );
-
     }
-
   };
 
 
@@ -560,15 +555,10 @@ function VendorProducts({
   if (loading) {
 
     return (
-
       <div className="vendor-loading">
-
         Loading products...
-
       </div>
-
     );
-
   }
 
 
@@ -581,7 +571,9 @@ function VendorProducts({
     <div className="vendor-layout">
 
 
-      {/* SIDEBAR */}
+      {/* =========================================
+          SIDEBAR
+      ========================================= */}
 
       <aside className="vendor-sidebar">
 
@@ -590,29 +582,35 @@ function VendorProducts({
         </h1>
 
 
-       <nav className="vendor-nav">
+        <nav className="vendor-nav">
 
-  <button onClick={onDashboard}>
-    Dashboard
-  </button>
+          <button onClick={onDashboard}>
+            Dashboard
+          </button>
 
-  <button className="active">
-    My Products
-  </button>
 
-  <button onClick={onSales}>
-    Sales
-  </button>
+          <button className="active">
+            My Products
+          </button>
 
-  <button onClick={onAnalytics}>
-    Customer Analytics
-  </button>
 
-  <button onClick={onVendorAnalytics}>
-    My Analytics
-  </button>
+          <button onClick={onSales}>
+            Sales
+          </button>
 
-</nav>
+
+          <button onClick={onAnalytics}>
+            Customer Analytics
+          </button>
+
+
+          <button onClick={onVendorAnalytics}>
+            My Analytics
+          </button>
+
+        </nav>
+
+
         <button
           className="vendor-logout"
           onClick={onLogout}
@@ -623,9 +621,14 @@ function VendorProducts({
       </aside>
 
 
-      {/* MAIN */}
+      {/* =========================================
+          MAIN
+      ========================================= */}
 
       <main className="vendor-main">
+
+
+        {/* HEADER */}
 
         <div className="products-header">
 
@@ -661,7 +664,9 @@ function VendorProducts({
         )}
 
 
-        {/* PRODUCT TABLE */}
+        {/* =========================================
+            PRODUCT TABLE
+        ========================================= */}
 
         <div className="vendor-table-container">
 
@@ -670,6 +675,10 @@ function VendorProducts({
             <thead>
 
               <tr>
+
+                <th>
+                  Image
+                </th>
 
                 <th>
                   Product
@@ -707,7 +716,7 @@ function VendorProducts({
                 <tr>
 
                   <td
-                    colSpan="6"
+                    colSpan="7"
                     className="empty-products"
                   >
                     No products found.
@@ -725,13 +734,51 @@ function VendorProducts({
                     }
                   >
 
+                    {/* IMAGE */}
+
                     <td>
-                      {product.name}
+
+                      <ProductImage
+                        src={
+                          product.image_url
+                        }
+                        name={
+                          product.name
+                        }
+                      />
+
                     </td>
+
+
+                    {/* PRODUCT NAME */}
+
+                    <td>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px"
+                        }}
+                      >
+
+                        <span>
+                          {product.name}
+                        </span>
+
+                      </div>
+
+                    </td>
+
+
+                    {/* CATEGORY */}
 
                     <td>
                       {product.category}
                     </td>
+
+
+                    {/* PRICE */}
 
                     <td>
 
@@ -745,9 +792,15 @@ function VendorProducts({
 
                     </td>
 
+
+                    {/* STOCK */}
+
                     <td>
                       {product.stock}
                     </td>
+
+
+                    {/* STATUS */}
 
                     <td>
 
@@ -770,6 +823,9 @@ function VendorProducts({
                       </span>
 
                     </td>
+
+
+                    {/* ACTIONS */}
 
                     <td>
 
@@ -827,13 +883,16 @@ function VendorProducts({
         </div>
 
 
-        {/* ADD / EDIT FORM */}
+        {/* =========================================
+            ADD / EDIT FORM
+        ========================================= */}
 
         {showForm && (
 
           <div className="product-modal">
 
             <div className="product-form-card">
+
 
               <h2>
 
@@ -875,6 +934,59 @@ function VendorProducts({
                   onChange={handleChange}
                   required
                 />
+
+
+                {/* IMAGE URL */}
+
+                <label>
+                  Product Image URL
+                </label>
+
+                <input
+                  type="url"
+                  name="image_url"
+                  value={form.image_url}
+                  onChange={handleChange}
+                  placeholder="https://example.com/product-image.jpg"
+                />
+
+
+                {/* IMAGE PREVIEW */}
+
+                {form.image_url.trim() && (
+
+                  <div
+                    style={{
+                      marginTop: "10px",
+                      marginBottom: "18px"
+                    }}
+                  >
+
+                    <p
+                      style={{
+                        marginBottom: "8px",
+                        fontSize: "13px",
+                        opacity: 0.7
+                      }}
+                    >
+                      Image Preview
+                    </p>
+
+
+                    <ProductImage
+                      src={
+                        form.image_url.trim()
+                      }
+                      name={
+                        form.name ||
+                        "Product preview"
+                      }
+                      size={110}
+                    />
+
+                  </div>
+
+                )}
 
 
                 {/* PRICE */}
@@ -934,8 +1046,12 @@ function VendorProducts({
                   <button
                     type="button"
                     className="vendor-primary-button"
-                    onClick={generateAIContent}
-                    disabled={generatingAI}
+                    onClick={
+                      generateAIContent
+                    }
+                    disabled={
+                      generatingAI
+                    }
                     style={{
                       padding: "8px 14px",
                       fontSize: "14px"
@@ -1028,9 +1144,7 @@ function VendorProducts({
       </main>
 
     </div>
-
   );
-
 }
 
 

@@ -72,3 +72,31 @@
   font-size: 14px;
   margin-top: 8px;
 }
+
+.signup-link {
+  margin-top: 20px;
+
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+
+  color: #bdbddd;
+
+  font-size: 14px;
+}
+
+.signup-link button {
+  border: none;
+  background: transparent;
+
+  color: #a981df;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.signup-link button:hover {
+  color: white;
+}

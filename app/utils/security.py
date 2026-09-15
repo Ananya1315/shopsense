@@ -10,7 +10,7 @@ import os
 from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
-
+from app.models.customer import Customer
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -105,3 +105,45 @@ def get_current_admin(
         )
 
     return current_vendor
+
+
+def get_current_customer(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+):
+
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        email = payload.get("sub")
+        role = payload.get("role")
+
+        if email is None or role != "customer":
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid customer token"
+            )
+
+    except JWTError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    customer = (
+        db.query(Customer)
+        .filter(Customer.email == email)
+        .first()
+    )
+
+    if customer is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Customer not found"
+        )
+
+    return customer

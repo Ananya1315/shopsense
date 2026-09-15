@@ -2,7 +2,7 @@ import { useState } from "react";
 import api from "../api/axios";
 import "../styles/login.css";
 
-function Login({ onLoginSuccess }) {
+function Login({ onLoginSuccess , onSignup}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -81,6 +81,16 @@ function Login({ onLoginSuccess }) {
           <button type="submit">
             Login
           </button>
+          <div className="signup-link">
+  <span>Don't have an account?</span>
+
+  <button
+    type="button"
+    onClick={onSignup}
+  >
+    Sign Up
+  </button>
+</div>
 
         </form>
 

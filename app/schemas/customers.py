@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class CustomerCreate(BaseModel):
@@ -6,6 +7,7 @@ class CustomerCreate(BaseModel):
     email: str
     phone: str
     area: str
+    password: str
 
 
 class CustomerResponse(BaseModel):
@@ -14,6 +16,7 @@ class CustomerResponse(BaseModel):
     email: str
     phone: str
     area: str
+    created_at: datetime
 
     class Config:
         from_attributes = True

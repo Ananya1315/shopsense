@@ -5,6 +5,60 @@ import api from "../api/axios";
 import "../styles/AdminProducts.css";
 
 
+// =====================================
+// PRODUCT IMAGE COMPONENT
+// =====================================
+
+function ProductImage({ src, name }) {
+
+  const [imageError, setImageError] = useState(false);
+
+
+  // No image or broken image
+  if (!src || imageError) {
+
+    return (
+      <div
+        style={{
+          width: "58px",
+          height: "58px",
+          borderRadius: "10px",
+          background: "rgba(93, 34, 232, 0.12)",
+          border: "1px solid rgba(93, 34, 232, 0.25)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "22px",
+          flexShrink: 0
+        }}
+      >
+        📦
+      </div>
+    );
+
+  }
+
+
+  return (
+    <img
+      src={src}
+      alt={name}
+      onError={() => setImageError(true)}
+      style={{
+        width: "58px",
+        height: "58px",
+        objectFit: "cover",
+        borderRadius: "10px",
+        border: "1px solid rgba(255,255,255,0.12)",
+        display: "block",
+        flexShrink: 0
+      }}
+    />
+  );
+
+}
+
+
 function AdminProducts({
   onDashboard,
   onVendors,
@@ -17,16 +71,23 @@ function AdminProducts({
   const [loading, setLoading] = useState(true);
 
 
+  // =====================================
+  // FETCH PRODUCTS
+  // =====================================
+
   const fetchProducts = async () => {
 
     try {
 
-      const response = await api.get("/products");
+      const response =
+        await api.get("/products");
+
 
       console.log(
         "Products received:",
         response.data
       );
+
 
       setProducts(response.data);
 
@@ -53,6 +114,10 @@ function AdminProducts({
   }, []);
 
 
+  // =====================================
+  // STOCK STATUS
+  // =====================================
+
   const getStockStatus = (stock) => {
 
     if (stock === 0) {
@@ -64,6 +129,7 @@ function AdminProducts({
     }
 
     return "in-stock";
+
   };
 
 
@@ -82,6 +148,10 @@ function AdminProducts({
   };
 
 
+  // =====================================
+  // LOADING
+  // =====================================
+
   if (loading) {
 
     return (
@@ -93,9 +163,14 @@ function AdminProducts({
   }
 
 
+  // =====================================
+  // PAGE
+  // =====================================
+
   return (
 
     <div className="dashboard">
+
 
       {/* =====================================
           SIDEBAR
@@ -109,6 +184,7 @@ function AdminProducts({
 
 
         <nav>
+
 
           {/* Dashboard */}
 
@@ -169,6 +245,7 @@ function AdminProducts({
 
       <main className="main-content">
 
+
         <div className="page-header">
 
           <div>
@@ -194,21 +271,46 @@ function AdminProducts({
 
           <table className="product-table">
 
+
             <thead>
 
               <tr>
 
-                <th>Product</th>
+                {/* NEW IMAGE COLUMN */}
 
-                <th>Category</th>
+                <th>
+                  Image
+                </th>
 
-                <th>Vendor ID</th>
 
-                <th>Price</th>
+                <th>
+                  Product
+                </th>
 
-                <th>Stock</th>
 
-                <th>Status</th>
+                <th>
+                  Category
+                </th>
+
+
+                <th>
+                  Vendor ID
+                </th>
+
+
+                <th>
+                  Price
+                </th>
+
+
+                <th>
+                  Stock
+                </th>
+
+
+                <th>
+                  Status
+                </th>
 
               </tr>
 
@@ -217,12 +319,13 @@ function AdminProducts({
 
             <tbody>
 
+
               {products.length === 0 ? (
 
                 <tr>
 
                   <td
-                    colSpan="6"
+                    colSpan="7"
                     className="no-products"
                   >
                     No products found.
@@ -235,8 +338,33 @@ function AdminProducts({
                 products.map((product) => (
 
                   <tr
-                    key={product.product_id}
+                    key={
+                      product.product_id
+                    }
                   >
+
+
+                    {/* =====================================
+                        PRODUCT IMAGE
+                    ====================================== */}
+
+                    <td>
+
+                      <ProductImage
+                        src={
+                          product.image_url
+                        }
+                        name={
+                          product.name
+                        }
+                      />
+
+                    </td>
+
+
+                    {/* =====================================
+                        PRODUCT NAME
+                    ====================================== */}
 
                     <td>
 
@@ -249,28 +377,43 @@ function AdminProducts({
                     </td>
 
 
+                    {/* CATEGORY */}
+
                     <td>
                       {product.category}
                     </td>
 
+
+                    {/* VENDOR */}
 
                     <td>
                       #{product.vendor_id}
                     </td>
 
 
+                    {/* PRICE */}
+
                     <td>
+
                       ₹{" "}
-                      {product.price.toLocaleString(
+
+                      {Number(
+                        product.price
+                      ).toLocaleString(
                         "en-IN"
                       )}
+
                     </td>
 
+
+                    {/* STOCK */}
 
                     <td>
                       {product.stock}
                     </td>
 
+
+                    {/* STATUS */}
 
                     <td>
 
@@ -287,6 +430,7 @@ function AdminProducts({
                       </span>
 
                     </td>
+
 
                   </tr>
 

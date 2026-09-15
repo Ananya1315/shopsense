@@ -61,6 +61,50 @@ def get_vendors(
 
     return vendors
 
+# -----------------------------------------
+# VENDOR SIGNUP
+# Public registration
+# Requires admin approval before login
+# -----------------------------------------
+
+@router.post("/vendor/signup")
+def vendor_signup(
+    vendor: VendorCreate,
+    db: Session = Depends(get_db)
+):
+
+    # Check if email already exists
+    existing_vendor = (
+        db.query(Vendor)
+        .filter(Vendor.email == vendor.email)
+        .first()
+    )
+
+    if existing_vendor:
+        raise HTTPException(
+            status_code=400,
+            detail="Vendor with this email already exists"
+        )
+
+    new_vendor = Vendor(
+        name=vendor.name,
+        email=vendor.email,
+        password=hash_password(vendor.password),
+        role="vendor",
+        phone=vendor.phone,
+        address=vendor.address,
+        status="pending"
+    )
+
+    db.add(new_vendor)
+    db.commit()
+    db.refresh(new_vendor)
+
+    return {
+        "message": "Vendor application submitted successfully. Await admin approval.",
+        "vendor_id": new_vendor.vendor_id,
+        "status": new_vendor.status
+    }
 
 # -----------------------------------------
 # GET SINGLE VENDOR
@@ -157,12 +201,25 @@ def reject_vendor(
 # -----------------------------------------
 # LOGIN
 # -----------------------------------------
+# -----------------------------------------
+# LOGIN
+# Vendor / Admin / Customer
+# -----------------------------------------
+
+# -----------------------------------------
+# LOGIN
+# Vendor / Admin / Customer
+# -----------------------------------------
 
 @router.post("/login")
-def login_vendor(
+def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
+
+    # =========================================
+    # CHECK VENDOR / ADMIN
+    # =========================================
 
     vendor = (
         db.query(Vendor)
@@ -170,41 +227,95 @@ def login_vendor(
         .first()
     )
 
-    if vendor is None:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid email or password"
+    if vendor:
+
+        # Check password
+        if not verify_password(
+            form_data.password,
+            vendor.password
+        ):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid email or password"
+            )
+
+        # Pending/rejected vendors cannot login
+        if vendor.status != "approved":
+            raise HTTPException(
+                status_code=403,
+                detail=f"Account is {vendor.status}. Admin approval required."
+            )
+
+        # Create JWT
+        access_token = create_access_token(
+            {
+                "sub": vendor.email,
+                "role": vendor.role,
+                "vendor_id": vendor.vendor_id
+            }
         )
 
-    if not verify_password(
-        form_data.password,
-        vendor.password
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid email or password"
-        )
-
-    # Pending/rejected vendors cannot login
-    if vendor.status != "approved":
-        raise HTTPException(
-            status_code=403,
-            detail=f"Account is {vendor.status}. Admin approval required."
-        )
-
-    access_token = create_access_token(
-        {
-            "sub": vendor.email,
-            "role": vendor.role
+        return {
+            "access_token": access_token,
+            "token_type": "bearer"
         }
+
+
+    # =========================================
+    # CHECK CUSTOMER
+    # =========================================
+
+    from app.models.customer import Customer
+
+    customer = (
+        db.query(Customer)
+        .filter(Customer.email == form_data.username)
+        .first()
     )
 
-    return {
-        "access_token": access_token,
-        "token_type": "bearer"
-    }
+    if customer:
+
+        # Existing customers created before
+        # password authentication was added
+        if not customer.password:
+            raise HTTPException(
+                status_code=401,
+                detail="Customer account needs to be registered again."
+            )
+
+        # Check password
+        if not verify_password(
+            form_data.password,
+            customer.password
+        ):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid email or password"
+            )
+
+        # Create customer JWT
+        access_token = create_access_token(
+            {
+                "sub": customer.email,
+                "role": "customer",
+                "customer_id": customer.customer_id
+            }
+        )
+
+        return {
+            "access_token": access_token,
+            "token_type": "bearer"
+        }
 
 
+    # =========================================
+    # NO ACCOUNT FOUND
+    # =========================================
+
+    raise HTTPException(
+        status_code=401,
+        detail="Invalid email or password"
+    )
 # -----------------------------------------
 # UPDATE VENDOR
 # -----------------------------------------

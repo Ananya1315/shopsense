@@ -11,6 +11,7 @@ class ProductCreate(BaseModel):
     price: float
     stock: int
     category: str
+    image_url: Optional[str] = None
 
 
 class ProductResponse(BaseModel):
@@ -23,14 +24,10 @@ class ProductResponse(BaseModel):
     price: float
     stock: int
     category: str
+    image_url: Optional[str] = None
 
     class Config:
         from_attributes = True
-
-
-# Used by vendors.
-# vendor_id is NOT supplied by the frontend.
-# It comes from the JWT/current logged-in vendor.
 
 class VendorProductCreate(BaseModel):
     name: str
@@ -40,7 +37,7 @@ class VendorProductCreate(BaseModel):
     price: float
     stock: int
     category: str
-
+    image_url: Optional[str] = None
 
 class VendorProductUpdate(BaseModel):
     name: str
@@ -50,7 +47,7 @@ class VendorProductUpdate(BaseModel):
     price: float
     stock: int
     category: str
-
+    image_url: Optional[str] = None
 
 class StockUpdate(BaseModel):
     stock: int
