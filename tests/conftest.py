@@ -1,6 +1,16 @@
 import os
 import sys
 
+# Test environment variables
+os.environ["DATABASE_URL"] = "sqlite:///./test.db?check_same_thread=false"
+os.environ["SECRET_KEY"] = "test-secret-key"
+os.environ["ALGORITHM"] = "HS256"
+os.environ["ACCESS_TOKEN_EXPIRE_MINUTES"] = "60"
+
+# Dummy Gemini key for CI/unit tests.
+# AI API calls should not be made by the basic unit tests.
+os.environ["GEMINI_API_KEY"] = "test-key"
+
 # =========================================================
 # MAKE PROJECT ROOT AVAILABLE TO PYTHON
 # =========================================================
