@@ -13,6 +13,9 @@ from app.schemas.transactions import (
     TransactionResponse
 )
 
+from app.utils.websocket_manager import manager
+
+
 router = APIRouter()
 
 
@@ -24,7 +27,7 @@ router = APIRouter()
     "/transactions",
     response_model=TransactionResponse
 )
-def create_transaction(
+async def create_transaction(
     transaction: TransactionCreate,
     db: Session = Depends(get_db)
 ):
@@ -141,6 +144,22 @@ def create_transaction(
     db.commit()
 
     db.refresh(new_transaction)
+
+
+    # -----------------------------------------------------
+    # SEND REAL-TIME WEBSOCKET EVENT TO VENDOR
+    # -----------------------------------------------------
+
+    await manager.send_to_vendor(
+        product.vendor_id,
+        {
+            "event": "new_transaction",
+            "transaction_id": new_transaction.transaction_id,
+            "product_id": product.product_id,
+            "quantity": new_transaction.quantity,
+            "total_amount": new_transaction.total_amount
+        }
+    )
 
 
     return new_transaction

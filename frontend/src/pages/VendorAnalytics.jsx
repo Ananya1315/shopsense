@@ -33,6 +33,9 @@ function VendorAnalytics({
 
   const [loading, setLoading] = useState(true);
 
+  // WebSocket connection status
+  const [isLive, setIsLive] = useState(false);
+
 
   // =========================================
   // FETCH VENDOR ANALYTICS
@@ -183,9 +186,189 @@ function VendorAnalytics({
   };
 
 
+  // =========================================
+  // FETCH ANALYTICS + WEBSOCKET
+  // =========================================
+
   useEffect(() => {
 
+    // Load analytics when page opens
     fetchAnalytics();
+
+
+    const token =
+      localStorage.getItem("access_token");
+
+
+    if (!token) {
+
+      console.error(
+        "Access token not found."
+      );
+
+      return;
+
+    }
+
+
+    let ws;
+
+
+    try {
+
+      // -----------------------------------------
+      // DECODE JWT
+      // -----------------------------------------
+
+      const payload =
+        JSON.parse(
+          atob(
+            token.split(".")[1]
+          )
+        );
+
+
+      const vendorId =
+        payload.vendor_id;
+
+
+      if (!vendorId) {
+
+        console.error(
+          "Vendor ID not found in JWT."
+        );
+
+        return;
+
+      }
+
+
+
+
+      ws =
+  new WebSocket(
+    `ws://127.0.0.1:8001/ws/vendor/${vendorId}`
+  );
+
+
+
+      ws.onopen = () => {
+
+        console.log(
+          "WebSocket connected for vendor:",
+          vendorId
+        );
+
+        setIsLive(true);
+
+      };
+
+
+      // -----------------------------------------
+      // MESSAGE RECEIVED
+      // -----------------------------------------
+
+      ws.onmessage = (event) => {
+
+        try {
+
+          const data =
+            JSON.parse(
+              event.data
+            );
+
+
+          console.log(
+            "WebSocket event received:",
+            data
+          );
+
+
+          // -----------------------------------------
+          // NEW TRANSACTION
+          // -----------------------------------------
+
+          if (
+            data.event ===
+            "new_transaction"
+          ) {
+
+            console.log(
+              "New transaction detected. Refreshing analytics..."
+            );
+
+            fetchAnalytics();
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "Failed to process WebSocket message:",
+            error
+          );
+
+        }
+
+      };
+
+
+      // -----------------------------------------
+      // WEBSOCKET ERROR
+      // -----------------------------------------
+
+      ws.onerror = (error) => {
+
+        console.error(
+          "WebSocket error:",
+          error
+        );
+
+        setIsLive(false);
+
+      };
+
+
+      // -----------------------------------------
+      // WEBSOCKET CLOSED
+      // -----------------------------------------
+
+      ws.onclose = () => {
+
+        console.log(
+          "WebSocket connection closed."
+        );
+
+        setIsLive(false);
+
+      };
+
+
+    } catch (error) {
+
+      console.error(
+        "Failed to initialize WebSocket:",
+        error
+      );
+
+      setIsLive(false);
+
+    }
+
+
+    // -----------------------------------------
+    // CLEANUP
+    // -----------------------------------------
+
+    return () => {
+
+      if (ws) {
+
+        ws.close();
+
+      }
+
+    };
 
   }, []);
 
@@ -212,6 +395,7 @@ function VendorAnalytics({
   return (
 
     <div className="vendor-layout">
+
 
       {/* =====================================
           SIDEBAR
@@ -284,9 +468,43 @@ function VendorAnalytics({
 
           <div>
 
-            <h1 className="vendor-page-title">
-              My Analytics
-            </h1>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px"
+              }}
+            >
+
+              <h1 className="vendor-page-title">
+                My Analytics
+              </h1>
+
+
+              {/* =================================
+                  LIVE STATUS
+              ================================== */}
+
+              <span
+                style={{
+                  fontSize: "13px",
+                  padding: "5px 10px",
+                  borderRadius: "20px",
+                  background: isLive
+                    ? "rgba(46, 204, 113, 0.15)"
+                    : "rgba(255, 255, 255, 0.08)",
+                  color: isLive
+                    ? "#2ecc71"
+                    : "#aaa"
+                }}
+              >
+                {isLive
+                  ? "🟢 Live"
+                  : "⚪ Offline"}
+              </span>
+
+            </div>
+
 
             <p className="vendor-page-subtitle">
               Monitor the performance of your products.
@@ -679,6 +897,7 @@ function VendorAnalytics({
           )}
 
         </section>
+
 
       </main>
 

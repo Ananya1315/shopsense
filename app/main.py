@@ -14,6 +14,7 @@ from app.api.analytics import router as analytic_router
 from app.api.customers import router as customer_router
 from app.api.transactions import router as transaction_router
 from app.api.ai_analyst import router as ai_analyst_router
+from app.api.websocket import router as websocket_router
 
 #print("Customers module:", customer_router.__file__)
 #print("Transactions module:", transaction_router.__file__)
@@ -41,6 +42,7 @@ app.include_router(analytic_router)
 app.include_router(customer_router)
 app.include_router(transaction_router)
 app.include_router(ai_analyst_router)
+app.include_router(websocket_router)
 
 
 @app.get("/")

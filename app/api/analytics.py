@@ -918,10 +918,6 @@ def export_vendor_analytics_csv(
             float(row.total_revenue or 0)
         ])
 
-    # -----------------------------------------
-    # PREPARE FILE
-    # -----------------------------------------
-
     output.seek(0)
 
     filename = (
