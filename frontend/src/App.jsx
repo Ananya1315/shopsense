@@ -13,6 +13,7 @@ import VendorProducts from "./pages/VendorProducts";
 import VendorSales from "./pages/VendorSales";
 import VendorCustomerAnalytics from "./pages/VendorCustomerAnalytics";
 import VendorAnalytics from "./pages/VendorAnalytics";
+import SalesForecast from "./pages/SalesForecast";
 
 import CustomerShop from "./pages/CustomerShop";
 import CustomerCart from "./pages/CustomerCart";
@@ -49,7 +50,8 @@ function App() {
 
   const getRoleFromToken = () => {
 
-    const token = localStorage.getItem("access_token");
+    const token =
+      localStorage.getItem("access_token");
 
     if (!token) {
       return null;
@@ -476,6 +478,10 @@ function VendorApp({ onLogout }) {
           setActivePage("vendorAnalytics")
         }
 
+        onForecast={() =>
+          setActivePage("forecast")
+        }
+
         onLogout={onLogout}
 
       />
@@ -506,6 +512,10 @@ function VendorApp({ onLogout }) {
 
         onVendorAnalytics={() =>
           setActivePage("vendorAnalytics")
+        }
+
+        onForecast={() =>
+          setActivePage("forecast")
         }
 
         onLogout={onLogout}
@@ -540,6 +550,10 @@ function VendorApp({ onLogout }) {
           setActivePage("vendorAnalytics")
         }
 
+        onForecast={() =>
+          setActivePage("forecast")
+        }
+
         onLogout={onLogout}
 
       />
@@ -570,6 +584,10 @@ function VendorApp({ onLogout }) {
 
         onVendorAnalytics={() =>
           setActivePage("vendorAnalytics")
+        }
+
+        onForecast={() =>
+          setActivePage("forecast")
         }
 
         onLogout={onLogout}
@@ -608,6 +626,50 @@ function VendorApp({ onLogout }) {
           setActivePage("vendorAnalytics")
         }
 
+        onForecast={() =>
+          setActivePage("forecast")
+        }
+
+        onLogout={onLogout}
+
+      />
+    );
+  }
+
+
+  // =========================================
+  // SALES FORECAST
+  // =========================================
+
+  if (activePage === "forecast") {
+
+    return (
+      <SalesForecast
+
+        onDashboard={() =>
+          setActivePage("dashboard")
+        }
+
+        onProducts={() =>
+          setActivePage("products")
+        }
+
+        onSales={() =>
+          setActivePage("sales")
+        }
+
+        onAnalytics={() =>
+          setActivePage("analytics")
+        }
+
+        onVendorAnalytics={() =>
+          setActivePage("vendorAnalytics")
+        }
+
+        onForecast={() =>
+          setActivePage("forecast")
+        }
+
         onLogout={onLogout}
 
       />
@@ -643,7 +705,8 @@ function CustomerApp({ onLogout }) {
       const existingProduct =
         currentCart.find(
           (item) =>
-            item.product_id === product.product_id
+            item.product_id ===
+            product.product_id
         );
 
 
@@ -652,18 +715,21 @@ function CustomerApp({ onLogout }) {
         return currentCart.map((item) => {
 
           if (
-            item.product_id === product.product_id
+            item.product_id ===
+            product.product_id
           ) {
 
             if (
-              item.quantity >= product.stock
+              item.quantity >=
+              product.stock
             ) {
               return item;
             }
 
             return {
               ...item,
-              quantity: item.quantity + 1
+              quantity:
+                item.quantity + 1
             };
           }
 
@@ -679,6 +745,7 @@ function CustomerApp({ onLogout }) {
           quantity: 1
         }
       ];
+
     });
   };
 
@@ -687,12 +754,15 @@ function CustomerApp({ onLogout }) {
   // REMOVE FROM CART
   // =========================================
 
-  const handleRemoveFromCart = (productId) => {
+  const handleRemoveFromCart = (
+    productId
+  ) => {
 
     setCart((currentCart) =>
       currentCart.filter(
         (item) =>
-          item.product_id !== productId
+          item.product_id !==
+          productId
       )
     );
   };
@@ -708,11 +778,11 @@ function CustomerApp({ onLogout }) {
   ) => {
 
     setCart((currentCart) =>
-
       currentCart.map((item) => {
 
         if (
-          item.product_id === productId
+          item.product_id ===
+          productId
         ) {
 
           if (newQuantity <= 0) {
@@ -720,7 +790,8 @@ function CustomerApp({ onLogout }) {
           }
 
           if (
-            newQuantity > item.stock
+            newQuantity >
+            item.stock
           ) {
             return item;
           }
@@ -732,8 +803,8 @@ function CustomerApp({ onLogout }) {
         }
 
         return item;
-      })
 
+      })
     );
   };
 
@@ -743,9 +814,7 @@ function CustomerApp({ onLogout }) {
   // =========================================
 
   const handleClearCart = () => {
-
     setCart([]);
-
   };
 
 
@@ -820,22 +889,24 @@ function CustomerApp({ onLogout }) {
   // ORDERS
   // =========================================
 
- if (activePage === "orders") {
+  if (activePage === "orders") {
 
-  return (
-    <CustomerOrders
-      onShop={() =>
-        setActivePage("shop")
-      }
+    return (
+      <CustomerOrders
 
-      onCart={() =>
-        setActivePage("cart")
-      }
+        onShop={() =>
+          setActivePage("shop")
+        }
 
-      onLogout={onLogout}
-    />
-  );
-}
+        onCart={() =>
+          setActivePage("cart")
+        }
+
+        onLogout={onLogout}
+
+      />
+    );
+  }
 
 
   return null;
