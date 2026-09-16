@@ -12,8 +12,9 @@ function VendorDashboard({
   onSales,
   onAnalytics,
   onVendorAnalytics,
+  onForecast,
   onLogout
-}) {
+})  {
 
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ function VendorDashboard({
     {
       sender: "ai",
       text:
-        "Hi! I'm your ShopSense AI Analyst 🤖 Ask me about your sales, revenue, products, inventory, or customers."
+        "Hi! I'm your ShopSense AI Analyst  Ask me about your sales, revenue, products, inventory, or customers."
     }
   ]);
 
@@ -371,6 +372,10 @@ function VendorDashboard({
           >
             My Analytics
           </button>
+          <button
+  onClick={onForecast}
+>Sales Forecast
+</button>
 
         </nav>
 

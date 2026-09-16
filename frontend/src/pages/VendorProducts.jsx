@@ -52,15 +52,12 @@ function ProductImage({ src, name, size = 58 }) {
 }
 
 
-// =========================================
-// MAIN COMPONENT
-// =========================================
-
 function VendorProducts({
   onDashboard,
   onSales,
   onAnalytics,
   onVendorAnalytics,
+  onForecast,
   onLogout
 }) {
   const [products, setProducts] = useState([]);
@@ -607,6 +604,9 @@ function VendorProducts({
           <button onClick={onVendorAnalytics}>
             My Analytics
           </button>
+          <button onClick={onForecast}>
+  Sales Forecast
+</button>
 
         </nav>
 

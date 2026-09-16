@@ -12,6 +12,7 @@ function VendorSales({
   onSales,
   onAnalytics,
   onVendorAnalytics,
+  onForecast,
   onLogout
 }) {
 
@@ -152,6 +153,9 @@ function VendorSales({
           >
             My Analytics
           </button>
+                  <button onClick={onForecast}>
+  Sales Forecast
+</button>
 
         </nav>
 
